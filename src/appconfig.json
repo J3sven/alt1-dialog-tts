@@ -1,9 +1,9 @@
 {
-	"appName": "example app",
-	"description": "minimal alt1 webpack/ts example test app",
+	"appName": "Dialogue Text to Speech",
+	"description": "Alt1 app that parses dialogue boxes to text to speech",
 	"appUrl": "./index.html",
 	"configUrl": "./appconfig.json",
-	"iconUrl": "",
+	"iconUrl": "./icon.png",
 	"defaultWidth": 250,
 	"defaultHeight": 250,
 	"minWidth": 250,

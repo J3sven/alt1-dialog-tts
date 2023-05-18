@@ -4,7 +4,11 @@
 		"watch": "npm run build -- --watch"
 	},
 	"dependencies": {
-		"@alt1/base": "^1.0.0-alpha.2"
+		"@alt1/base": "^1.0.0-alpha.2",
+		"@alt1/dialog": "^1.0.0-alpha.6",
+		"@types/aws-sdk": "^2.7.0",
+		"aws-sdk": "^2.1378.0",
+		"speak-tts": "^2.0.8"
 	},
 	"devDependencies": {
 		"@alt1/imagedata-loader": "^1.0.0-alpha.2",
