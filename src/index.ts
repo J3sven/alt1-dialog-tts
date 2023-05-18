@@ -25,7 +25,7 @@ document.getElementById("settings-form").addEventListener("submit", function (ev
 	const elevenlabsApiKeyField = (document.getElementById("elevenlabs-apikey") as HTMLInputElement).value;
 	const awsTtsEngineField = (document.getElementById("aws-ttsengine") as HTMLInputElement);
 	let neuralEngine = "false"
-	if(awsTtsEngineField.checked) neuralEngine = "true"
+	if (awsTtsEngineField.checked) neuralEngine = "true"
 
 	localStorage.setItem("player", playerField);
 	localStorage.setItem("isFemale", isFemaleField);
@@ -43,38 +43,57 @@ document.getElementById("settings-form").addEventListener("submit", function (ev
 	window.location.reload();
 });
 
+const form = document.getElementById("settings-form") as HTMLFormElement;
+const nameForm = document.getElementById("player") as HTMLInputElement;
+const genderSelect = document.getElementById("gender") as HTMLSelectElement;
 const select = document.getElementById("tts-engine") as HTMLSelectElement;
-const awsElements = document.getElementsByClassName("aws");
-const elevenlabsElements = document.getElementsByClassName("elevenlabs");
+const submitButton = form.querySelector(".formsubmit") as HTMLButtonElement;
 
-function handleSelectChange() {
-  const selectedOption = select.value;
-  
-  // Hide all AWS and Elevenlabs elements
-  for (let i = 0; i < awsElements.length; i++) {
-    const element = awsElements[i] as HTMLElement;
-    element.style.display = "none";
-  }
-  for (let i = 0; i < elevenlabsElements.length; i++) {
-    const element = elevenlabsElements[i] as HTMLElement;
-    element.style.display = "none";
-  }
-  
-  // Show elements based on the selected option
-  if (selectedOption === "aws") {
-    for (let i = 0; i < awsElements.length; i++) {
-      const element = awsElements[i] as HTMLElement;
-      element.style.display = "";
-    }
-  } else if (selectedOption === "elevenlabs") {
-    for (let i = 0; i < elevenlabsElements.length; i++) {
-      const element = elevenlabsElements[i] as HTMLElement;
-      element.style.display = "";
-    }
-  }
+const awsElements = document.getElementsByClassName("aws") as HTMLCollectionOf<HTMLElement>;
+const elevenlabsElements = document.getElementsByClassName("elevenlabs") as HTMLCollectionOf<HTMLElement>;
+
+function handleSelectChange(addCtaClass = true) {
+	const selectedOption = select.value;
+
+	// Hide all AWS and Elevenlabs elements
+	for (let i = 0; i < awsElements.length; i++) {
+		awsElements[i].style.display = "none";
+	}
+	for (let i = 0; i < elevenlabsElements.length; i++) {
+		elevenlabsElements[i].style.display = "none";
+	}
+
+	// Show elements based on the selected option
+	if (selectedOption === "aws" || selectedOption === "elevenlabs") {
+		const elementsToDisplay = selectedOption === "aws" ? awsElements : elevenlabsElements;
+		for (let i = 0; i < elementsToDisplay.length; i++) {
+			elementsToDisplay[i].style.display = "";
+		}
+	}
+
+	if (addCtaClass) {
+		submitButton.classList.add("cta");
+	}
 }
 
-select.addEventListener("change", handleSelectChange);
+function handleInputChange() {
+	submitButton.classList.add("cta");
+}
+
+// Add event listeners to all input and select elements
+Array.from(form.querySelectorAll("input, select")).forEach((element: HTMLElement) => {
+	element.addEventListener("change", handleInputChange);
+});
+
+nameForm.addEventListener("change", () => handleInputChange());
+select.addEventListener("change", () => handleSelectChange(true));
+genderSelect.addEventListener("change", () => handleSelectChange(true));
+
+// Call handleSelectChange initially to set the form state based on the initial select value, but don't add the cta class
+handleSelectChange(false);
+
+
+
 
 window.setInterval(async () => {
 	try {

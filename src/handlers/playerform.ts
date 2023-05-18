@@ -22,10 +22,6 @@ export function populateFormFromLocalStorage() {
     const storedAwsttsEngine = localStorage.getItem("awsttsEngine");
     const storedElevenlabsApiKey = localStorage.getItem("elevenlabsapikey");
 
-    console.log("awsttsEngine", storedAwsttsEngine);
-
-
-
     if (storedPlayer !== null) {
         (document.getElementById("player") as HTMLInputElement).value = storedPlayer;
     }

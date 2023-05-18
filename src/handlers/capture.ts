@@ -40,7 +40,6 @@ export async function capture(player:any) {
 	let dialogBool = dialog.find(img);
 
 	if (dialogBool != false) {
-		console.log("dialog is open")
 		let dialogcheck = dialog.checkDialog(img);
 		let name = dialog.readTitle(img);
 		let cleanName = processNameString(String(name));

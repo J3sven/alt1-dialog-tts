@@ -6,17 +6,63 @@ import * as meSpeak from './meSpeak';
 const femaleNpcs = 'http://j3.gg/alt1/dialog-tts/femaleNpcs.json'
 var genderCache: { FemaleNpcs: string[] } | null = null;
 
-export class AwsTextToSpeech {
-    private polly: AWS.Polly;
-    private audioQueue: string[] = [];
-    private isPlaying = false;
-    private lastProcessedString: string | null = null;
-    private femaleVoice = "Joanna";
-    private maleVoice = "Matthew";
-    private neural = false;
+export abstract class TextToSpeech<T> {
+    protected audioQueue: T[] = [];
+    protected isPlaying = false;
+    protected lastProcessedString: string | null = null;
+    protected femaleVoice: string;
+    protected maleVoice: string;
     public audioVolume: number = 1;
 
+    constructor() {
+        const volumeSlider = document.getElementById('volume') as HTMLInputElement;
+        volumeSlider.addEventListener('input', () => {
+            this.audioVolume = parseFloat(volumeSlider.value);
+        });
+    }
+
+    public async speak(text: string, name: string, player: any): Promise<void> {
+        if (!text) {
+            console.error('Text is empty.');
+            return;
+        }
+
+        if (this.lastProcessedString === text) {
+            return;
+        }
+
+        if (this.isPlaying && this.isInAudioQueue(text)) {
+            return;
+        }
+
+
+        this.lastProcessedString = text;
+
+        let genderVoice = this.maleVoice;
+
+        const jsonData = await loadGenderData(femaleNpcs, genderCache);
+        if (stringExistsInJson(name.toUpperCase(), jsonData)) genderVoice = this.femaleVoice;
+
+        if (name === player.self && player.selfFemale) genderVoice = this.femaleVoice;
+
+        await this.processSpeech(text, genderVoice);
+    }
+
+    protected abstract isInAudioQueue(text: string): boolean;
+
+    protected abstract processSpeech(text: string, genderVoice: string): Promise<void>;
+}
+
+
+export class AwsTextToSpeech extends TextToSpeech<string> {
+    private polly: AWS.Polly;
+    private neural = false;
+
     constructor(accessKeyId: string, secretAccessKey: string, region: string, neural?: boolean) {
+        super();
+        this.femaleVoice = "Joanna";
+        this.maleVoice = "Matthew";
+
         AWS.config.region = region;
         AWS.config.credentials = new AWS.Credentials({
             accessKeyId: accessKeyId,
@@ -27,37 +73,13 @@ export class AwsTextToSpeech {
         this.neural = neural || false;
     }
 
-    public async speak(text: string, name: string, player: any): Promise<void> {
+    protected isInAudioQueue(text: string): boolean {
+        return this.audioQueue.indexOf(text) !== -1;
+    }
 
-        const volumeSlider = document.getElementById('volume') as HTMLInputElement;
-        volumeSlider.addEventListener('input', () => {
-            this.audioVolume = parseFloat(volumeSlider.value);
-        });
-
-        if (!text) {
-            console.error('Text is empty.');
-            return;
-        }
-
-        if (this.isPlaying && this.audioQueue.indexOf(text) !== -1) {
-            return;
-        }
-
-        if (this.lastProcessedString === text) {
-            return;
-        }
-
-
-        this.lastProcessedString = text;
-
-        let genderVoice = this.maleVoice;
-        const jsonData = await loadGenderData(femaleNpcs, genderCache);
-        if (stringExistsInJson(name.toUpperCase(), jsonData)) genderVoice = this.femaleVoice;
-        console.log('name', name, player.self, player.selfFemale, player);
-        if (name === player.self && player.selfFemale) genderVoice = this.femaleVoice;
-
+    protected async processSpeech(text: string, genderVoice: string): Promise<void> {
         const params: AWS.Polly.SynthesizeSpeechInput = {
-            Engine: this.neural? 'neural' : 'standard',
+            Engine: this.neural ? 'neural' : 'standard',
             Text: processString(text),
             OutputFormat: 'mp3',
             VoiceId: genderVoice,
@@ -79,8 +101,8 @@ export class AwsTextToSpeech {
         }
     }
 
-
     private async playNext(): Promise<void> {
+
         if (this.audioQueue.length === 0) {
             this.isPlaying = false;
             return;
@@ -97,48 +119,22 @@ export class AwsTextToSpeech {
     }
 }
 
-export class MeSpeakTextToSpeech {
-    private audioQueue: { text: string; voice: string }[] = [];
-    private isPlaying = false;
-    private lastProcessedString: string | null = null;
-    private femaleVoice = 'en/en+f3';
-    private maleVoice = 'en/en+m3';
-    public audioVolume: number = 1;
 
+export class MeSpeakTextToSpeech extends TextToSpeech<{ text: string; voice: string }> {
     constructor() {
+        super();
+        this.femaleVoice = 'en/en+f3';
+        this.maleVoice = 'en/en+m3';
+
         meSpeak.loadConfig('./mespeak_config.json');
         meSpeak.loadVoice('./voices/en.json');
     }
 
-    public async speak(text: string, name: string, player: any) {
+    protected isInAudioQueue(text: string): boolean {
+        return this.audioQueue.some(item => item.text === text);
+    }
 
-        const volumeSlider = document.getElementById('volume') as HTMLInputElement;
-        volumeSlider.addEventListener('input', () => {
-            this.audioVolume = parseFloat(volumeSlider.value);
-        });
-
-        if (!text) {
-            console.error('Text is empty.');
-            return;
-        }
-
-        if (this.isPlaying && this.audioQueue.some(item => item.text === text)) {
-            return;
-        }
-
-        if (this.lastProcessedString === text) {
-            return;
-        }
-
-        this.lastProcessedString = text;
-
-        let genderVoice = this.maleVoice;
-
-        const jsonData = await loadGenderData(femaleNpcs, genderCache);
-        if (stringExistsInJson(name.toUpperCase(), jsonData)) genderVoice = this.femaleVoice;
-
-        if (name === player.self && player.selfFemale) genderVoice = this.femaleVoice;
-
+    protected async processSpeech(text: string, genderVoice: string): Promise<void> {
         this.enqueueAudio({ text, voice: genderVoice });
     }
 
@@ -154,11 +150,11 @@ export class MeSpeakTextToSpeech {
             this.isPlaying = false;
             return;
         }
-    
+
         this.isPlaying = true;
         const { text, voice } = this.audioQueue.shift();
         const wavData = meSpeak.speak(text, { voice, rawdata: 'array' });
-    
+
         if (wavData && !(wavData instanceof Boolean)) {
             const blob = new Blob([new Uint8Array(wavData as ArrayBuffer)], { type: 'audio/wav' });
             const audioURL = URL.createObjectURL(blob);
@@ -175,55 +171,40 @@ export class MeSpeakTextToSpeech {
     }
 }
 
-export class ElevenLabsTextToSpeech {
+export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
     private xiApiKey: string;
-    private femaleVoiceId: string;
-    private maleVoiceId: string;
-    private audioQueue: string[] = [];
-    private isPlaying = false;
-    private lastProcessedString: string | null = null;
-    public audioVolume: number = 0.7;
 
     constructor(xiApiKey: string, femaleVoiceId: string, maleVoiceId: string) {
+        super();
         this.xiApiKey = xiApiKey;
-        this.femaleVoiceId = femaleVoiceId;
-        this.maleVoiceId = maleVoiceId;
-
-        const volumeSlider = document.getElementById('volume') as HTMLInputElement;
-        volumeSlider.addEventListener('input', () => {
-            this.audioVolume = parseFloat(volumeSlider.value);
-        });
+        this.femaleVoice = femaleVoiceId;
+        this.maleVoice = maleVoiceId;
     }
 
-    public async speak(text: string, name: string, player: any): Promise<void> {
-        if (!text) {
-            console.error('Text is empty.');
-            return;
-        }
+    protected getFemaleVoice(): string {
+        return this.femaleVoice;
+    }
 
-        if (this.isPlaying && this.audioQueue.indexOf(text) !== -1) {
-            return;
-        }
+    protected getMaleVoice(): string {
+        return this.maleVoice;
+    }
 
-        if (this.lastProcessedString === text) {
-            return;
-        }
+    protected isInAudioQueue(text: string): boolean {
+        return this.audioQueue.includes(text);
+    }
 
-        this.lastProcessedString = text;
-
-        let genderVoiceId = this.maleVoiceId;
-        const jsonData = await loadGenderData(femaleNpcs, genderCache);
-        if (stringExistsInJson(name.toUpperCase(), jsonData)) genderVoiceId = this.femaleVoiceId;
-        if (name === player.self && player.selfFemale) genderVoiceId = this.femaleVoiceId;
-        if (name == null || name == "") return
+    protected async processSpeech(text: string, voiceId: string): Promise<void> {
         try {
-            const response = await this.textToSpeech(text, genderVoiceId);
+            const response = await this.textToSpeech(text, voiceId);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const audioContent = await response.blob();
             const audioSrc = URL.createObjectURL(audioContent);
-            this.enqueueAudio(audioSrc);
+            this.audioQueue.push(audioSrc);
+            if (!this.isPlaying) {
+                await this.playNext();
+            }
         } catch (error) {
             console.error('Error while fetching Eleven Labs TTS API:', error);
         }
@@ -254,13 +235,6 @@ export class ElevenLabsTextToSpeech {
         });
 
         return response;
-    }
-
-    private enqueueAudio(audioSrc: string): void {
-        this.audioQueue.push(audioSrc);
-        if (!this.isPlaying) {
-            this.playNext();
-        }
     }
 
     private async playNext(): Promise<void> {
