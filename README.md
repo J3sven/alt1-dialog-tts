@@ -1,5 +1,7 @@
 # Alt1 dialog tts
 
+WIP alt1 app that parses dialog boxes in RuneScape into various Text-to-speech APIs
+
 how to use
 ```sh
 #to initialize the repo and install dependencies
