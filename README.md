@@ -1,4 +1,4 @@
-# Minimal Alt1/webpack/typescript example
+# Alt1 dialog tts
 
 how to use
 ```sh
