@@ -27,6 +27,10 @@ export abstract class TextToSpeech<T> {
             return;
         }
 
+        if (!name || name === '') {
+            return;
+        }
+
         if (this.lastProcessedString === text) {
             return;
         }
