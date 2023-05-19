@@ -4,9 +4,12 @@ import { getPlayerFromLocalStorage } from "./handlers/self";
 import { populateFormFromLocalStorage } from "./handlers/playerform";
 import { capture } from "./handlers/capture";
 
-//tell webpack to add index.html and appconfig.json to output
 require("!file-loader?name=[name].[ext]!./index.html");
+require("!file-loader?name=[name].[ext]!./app.css");
+require("!file-loader?name=[name].[ext]!./icon.png");
+require("!file-loader?name=[name].[ext]!./femaleNpcs.json");
 require("!file-loader?name=[name].[ext]!./appconfig.json");
+require("!file-loader?name=[name].[ext]!./mespeak_config.json");
 
 populateFormFromLocalStorage();
 
