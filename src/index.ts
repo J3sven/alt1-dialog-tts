@@ -15,7 +15,6 @@ populateFormFromLocalStorage();
 
 const player = getPlayerFromLocalStorage();
 
-
 document.getElementById("settings-form").addEventListener("submit", function (event) {
 	event.preventDefault();
 
@@ -39,10 +38,6 @@ document.getElementById("settings-form").addEventListener("submit", function (ev
 	localStorage.setItem("elevenlabsapikey", elevenlabsApiKeyField);
 	localStorage.setItem("awsttsEngine", neuralEngine);
 
-	const updatedPlayer = getPlayerFromLocalStorage();
-
-	player.self = updatedPlayer.self;
-	player.selfFemale = updatedPlayer.selfFemale;
 	window.location.reload();
 });
 

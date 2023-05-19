@@ -3,7 +3,7 @@ import { processString, stringExistsInJson } from './stringfunctions';
 import { loadGenderData } from './gender';
 import * as meSpeak from './meSpeak';
 
-const femaleNpcs = 'http://j3.gg/alt1/dialog-tts/femaleNpcs.json'
+const femaleNpcs = './femaleNpcs.json'
 var genderCache: { FemaleNpcs: string[] } | null = null;
 
 export abstract class TextToSpeech<T> {
