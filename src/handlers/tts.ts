@@ -27,6 +27,8 @@ export abstract class TextToSpeech<T> {
             return;
         }
 
+        console.log('Text to speech: ',name)
+
         if (!name || name === '') {
             return;
         }
