@@ -77,4 +77,8 @@ settingsToggle.addEventListener("click", () => {
 
 if (window.alt1) {
     alt1.identifyAppUrl("./appconfig.json");
+} else{
+	const output = document.getElementById("status");
+	output.insertAdjacentHTML("beforeend", `<div>You need to run this page in alt1 to capture the screen</div>`);
+	if (!alt1.permissionPixel) output.insertAdjacentHTML("beforeend", `<div>Page is not installed as app or capture permission is not enabled</div>`);
 }

@@ -8,6 +8,11 @@
 	<body>
 		<header><strong>Dialogue TTS</strong> <button title="Settings" id="settingsToggle">⚙️</button></header>
 		<h3 id="currentEngine">mespeak</h3>
+		<div id="progress-bar" style="position: absolute; bottom: 5px; width: 82%; left: 9%; background-color: #3b4a56; height: 5px;">
+			<div id="progress" style="height: 100%; background-color: #d9a81e; width: 0%; transition: width 0.1s;"></div>
+		</div>
+		
+
 		<div id="settings" class="hidden">
 			<div class="formgroup volumeSettings">
 				<label title="Sound volume" for="volume">Audio volume</label>

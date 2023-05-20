@@ -3,17 +3,29 @@ import { processString, stringExistsInJson } from './stringfunctions';
 import { loadGenderData } from './gender';
 import * as meSpeak from './meSpeak';
 import { getXiCharactersRemaining } from "./xilabs";
+import { gsap } from 'gsap';
 
 const femaleNpcs = './femaleNpcs.json'
 var genderCache: { FemaleNpcs: string[] } | null = null;
 
 export abstract class TextToSpeech<T> {
     protected audioQueue: T[] = [];
-    protected isPlaying = false;
+    public isPlaying = false;
     protected lastProcessedString: string | null = null;
     protected femaleVoice: string;
     protected maleVoice: string;
     public audioVolume: number = 1;
+
+    public updateProgress(ratio: number): void {
+        const progressBar = document.getElementById('progress') as HTMLElement;
+        if (progressBar) {
+            gsap.to(progressBar, {
+                width: (ratio * 100).toFixed(2) + '%',
+                duration: 0.1,
+                ease: "power1.inOut"
+            });
+        }
+    }
 
     constructor() {
         const volumeSlider = document.getElementById('volume') as HTMLInputElement;
@@ -27,8 +39,6 @@ export abstract class TextToSpeech<T> {
             console.error('Text is empty.');
             return;
         }
-
-        console.log('Text to speech: ',name)
 
         if (!name || name === '') {
             return;
@@ -118,6 +128,12 @@ export class AwsTextToSpeech extends TextToSpeech<string> {
         this.isPlaying = true;
         const audioSrc = this.audioQueue.shift();
         const audio = new Audio(audioSrc);
+        audio.addEventListener('loadedmetadata', () => {
+            this.updateProgress(0);
+        });
+        audio.addEventListener('timeupdate', () => {
+            this.updateProgress(audio.currentTime / audio.duration);
+        });
         audio.volume = this.audioVolume;
         audio.onended = async () => {
             await this.playNext();
@@ -166,6 +182,12 @@ export class MeSpeakTextToSpeech extends TextToSpeech<{ text: string; voice: str
             const blob = new Blob([new Uint8Array(wavData as ArrayBuffer)], { type: 'audio/wav' });
             const audioURL = URL.createObjectURL(blob);
             const audio = new Audio(audioURL);
+            audio.addEventListener('loadedmetadata', () => {
+                this.updateProgress(0);
+            });
+            audio.addEventListener('timeupdate', () => {
+                this.updateProgress(audio.currentTime / audio.duration);
+            });
             audio.volume = this.audioVolume;
             audio.onended = () => {
                 this.playNext();
@@ -264,6 +286,12 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
 
         const audio = new Audio(audioSrc);
         audio.volume = this.audioVolume;
+        audio.addEventListener('loadedmetadata', () => {
+            this.updateProgress(0);
+        });
+        audio.addEventListener('timeupdate', () => {
+            this.updateProgress(audio.currentTime / audio.duration);
+        });
         audio.addEventListener('ended', () => {
             this.playNext();
         });

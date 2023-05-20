@@ -8,6 +8,7 @@
 		"@alt1/dialog": "^1.0.0-alpha.6",
 		"@types/aws-sdk": "^2.7.0",
 		"aws-sdk": "^2.1378.0",
+		"gsap": "^3.11.5",
 		"speak-tts": "^2.0.8"
 	},
 	"devDependencies": {
