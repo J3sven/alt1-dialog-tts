@@ -243,6 +243,7 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
 
         
         let remainingCharacters = await getXiCharactersRemaining();
+        document.getElementById("currentEngine").innerText = "Elevenlabs";
         document.getElementById("currentEngine").append(" (" + remainingCharacters + ")");
 
         return response;

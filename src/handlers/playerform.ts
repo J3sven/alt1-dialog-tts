@@ -1,3 +1,5 @@
+import { capitalizeName } from "./stringfunctions";
+
 export function setFormListener() {
     document.getElementById("settings-form").addEventListener("submit", function (event) {
         event.preventDefault();
@@ -32,7 +34,7 @@ export async function populateFormFromLocalStorage() {
 
     if (storedTtsEngine !== null) {
         (document.getElementById("tts-engine") as HTMLSelectElement).value = storedTtsEngine;
-        document.getElementById("currentEngine").innerText = storedTtsEngine;
+        document.getElementById("currentEngine").innerText = capitalizeName(storedTtsEngine);
     } else{
         (document.getElementById("tts-engine") as HTMLSelectElement).value = "mespeak";
         document.getElementById("currentEngine").innerText =  "mespeak";
