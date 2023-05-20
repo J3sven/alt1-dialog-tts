@@ -1,74 +1,45 @@
 import { capitalizeName } from "./stringfunctions";
 import { getXiCharactersRemaining } from "./xilabs";
 
+const localStorageKeys = ["player", "isFemale", "ttsEngine", "awsRegion", "awsAccessKey", "awsSecretKey", "awsttsEngine", "elevenlabsapikey"];
+
 export function setFormListener() {
-    document.getElementById("settings-form").addEventListener("submit", function (event) {
+    document.getElementById("settings-form").addEventListener("submit", (event) => {
         event.preventDefault();
-
-        const player = (document.getElementById("player") as HTMLInputElement).value;
-        const isFemale = (document.getElementById("gender") as HTMLSelectElement).value;
-
-        localStorage.setItem("player", player);
-        localStorage.setItem("isFemale", isFemale);
+        localStorage.setItem("player", (document.getElementById("player") as HTMLInputElement).value);
+        localStorage.setItem("isFemale", (document.getElementById("gender") as HTMLSelectElement).value);
     });
-    
 }
 
-// Check if localStorage values are set and autopopulate the form
 export async function populateFormFromLocalStorage() {
-    const storedPlayer = localStorage.getItem("player");
-    const storedIsFemale = localStorage.getItem("isFemale");
+    for (const key of localStorageKeys) {
+        const value = localStorage.getItem(key);
+        if (value !== null && document.getElementById(key) !== null) {
+            (document.getElementById(key) as HTMLInputElement | HTMLSelectElement).value = value;
+        }
+    }
     const storedTtsEngine = localStorage.getItem("ttsEngine");
-    const storedAwsRegion = localStorage.getItem("awsRegion");
-    const storedAwsAccessKey = localStorage.getItem("awsAccessKey");
-    const storedAwsSecretKey = localStorage.getItem("awsSecretKey");
     const storedAwsttsEngine = localStorage.getItem("awsttsEngine");
-    const storedElevenlabsApiKey = localStorage.getItem("elevenlabsapikey");
 
-    if (storedPlayer !== null) {
-        (document.getElementById("player") as HTMLInputElement).value = storedPlayer;
-    }
-
-    if (storedIsFemale !== null) {
-        (document.getElementById("gender") as HTMLSelectElement).value = storedIsFemale;
-    }
-
+    const currentEngineElement = document.getElementById("currentEngine");
     if (storedTtsEngine !== null) {
-        (document.getElementById("tts-engine") as HTMLSelectElement).value = storedTtsEngine;
-        document.getElementById("currentEngine").innerText = capitalizeName(storedTtsEngine);
+        currentEngineElement.innerText = capitalizeName(storedTtsEngine);
         if(storedTtsEngine === "elevenlabs") {
-            let remainingCharacters = await getXiCharactersRemaining();
-            document.getElementById("currentEngine").append(" (" + remainingCharacters + ")");
+            const remainingCharacters = await getXiCharactersRemaining();
+            currentEngineElement.append(` (${remainingCharacters})`);
         } else if (storedTtsEngine === "aws") {
-            document.getElementById("currentEngine").innerText = "Amazon Polly";
+            currentEngineElement.innerText = "Amazon Polly";
             if (storedAwsttsEngine === "true"){
-                document.getElementById("currentEngine").append(" (Neural)");
+                currentEngineElement.append(" (Neural)");
             }
         }
-    } else{
-        (document.getElementById("tts-engine") as HTMLSelectElement).value = "mespeak";
-        document.getElementById("currentEngine").innerText =  "mespeak";
-    }
-
-    if (storedAwsRegion !== null) {
-        (document.getElementById("aws-region") as HTMLSelectElement).value = storedAwsRegion;
-    }
-
-    if (storedAwsAccessKey !== null) {
-        (document.getElementById("aws-accesskey") as HTMLInputElement).value = storedAwsAccessKey;
-    }
-
-    if (storedAwsSecretKey !== null) {
-        (document.getElementById("aws-secretkey") as HTMLInputElement).value = storedAwsSecretKey;
-    }
-
-    if (storedElevenlabsApiKey !== null) {
-        (document.getElementById("elevenlabs-apikey") as HTMLInputElement).value = storedElevenlabsApiKey;
+    } else {
+        (document.getElementById("ttsEngine") as HTMLSelectElement).value = "mespeak";
+        currentEngineElement.innerText = "mespeak";
     }
 
     if (storedAwsttsEngine !== null) {
-        const checkbox = document.getElementById("aws-ttsengine") as HTMLInputElement;
+        const checkbox = document.getElementById("awsttsEngine") as HTMLInputElement;
         checkbox.checked = storedAwsttsEngine === "true";
     }
 }
-

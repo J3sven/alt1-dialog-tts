@@ -30,7 +30,7 @@
 
 				<div class="formgroup tts">
 					<label for="tts-engine">TTS Engine</label>
-					<select name="tts-engine" id="tts-engine" required>
+					<select name="tts-engine" id="ttsEngine" required>
 						<option value="mespeak">meSpeak (default)</option>
 						<option value="aws">Amazon Polly</option>
 						<option value="elevenlabs">Elevenlabs</option>
@@ -39,7 +39,7 @@
 				
 				<div class="formgroup elevenlabs elevenlabs-apikey" style="display: none;">
 					<label for="elevenlabs-apikey">Elevenlabs API key</label>
-					<input type="password" id="elevenlabs-apikey" name="elevenlabs-apikey">
+					<input type="password" id="elevenlabsapikey" name="elevenlabs-apikey">
 				</div>
 
 				<div class="formgroup aws" style="display: none;">
@@ -48,7 +48,7 @@
 
 				<div class="formgroup aws-region aws" style="display: none;">
 					<label for="aws-region">Region</label>
-					<select id="aws-region" name="aws-region">
+					<select id="awsRegion" name="aws-region">
 						<option value="us-west-2">US West (Oregon) Region</option>
 						<option value="us-east-1">US East (Northern Virginia) Region</option>
 						<option value="us-west-1">US West (Northern California) Region</option>
@@ -85,17 +85,17 @@
 				</div>
 				<div class="formgroup aws aws-accesskey" style="display: none;">
 					<label for="aws-accesskey">AWS Access key</label>
-					<input type="text" id="aws-accesskey" name="aws-accesskey">
+					<input type="text" id="awsAccessKey" name="aws-accesskey">
 				</div>
 
 				<div class="formgroup aws aws-secretkey" style="display: none;">
 					<label for="aws-secretkey">AWS Secret key</label>
-					<input type="password" id="aws-secretkey" name="aws-secretkey">
+					<input type="password" id="awsSecretKey" name="aws-secretkey">
 				</div>
 
 				<div class="formgroup aws aws-ttsengine" style="display: none;">
 					<label for="aws-ttsengine">Neural engine</label>
-					<input type="checkbox" name="aws-ttsengine" id="aws-ttsengine">
+					<input type="checkbox" name="aws-ttsengine" id="awsttsEngine">
 				</div>
 
 				<div class="formgroup">

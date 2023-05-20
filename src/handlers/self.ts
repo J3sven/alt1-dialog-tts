@@ -1,19 +1,12 @@
-export function definePlayer(playerName: string | null, female:boolean | null){
-    let selfFemale = false;
-    let self = null;
-    if (playerName === null) {
+export function definePlayer(playerName: string | null, female: boolean | null) {
+    if (!playerName) {
         console.error('Player name is empty.');
         return;
-    } else{
-        self = playerName;
     }
-
-    
-    if(female == true){
-        selfFemale = true;
+    return {
+        self: playerName,
+        selfFemale: female === true
     }
-
-    return {self, selfFemale}
 }
 
 export function getPlayerFromLocalStorage(): ReturnType<typeof definePlayer> {

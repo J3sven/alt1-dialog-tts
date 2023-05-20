@@ -1,9 +1,6 @@
-//alt1 base libs, provides all the commonly used methods for image matching and capture
-//also gives your editor info about the window.alt1 api
 import { getPlayerFromLocalStorage } from "./handlers/self";
 import { populateFormFromLocalStorage } from "./handlers/playerform";
 import { capture } from "./handlers/capture";
-import { getXiCharactersRemaining } from "./handlers/xilabs";
 
 require("!file-loader?name=[name].[ext]!./index.html");
 require("!file-loader?name=[name].[ext]!./app.css");
@@ -13,97 +10,71 @@ require("!file-loader?name=[name].[ext]!./appconfig.json");
 require("!file-loader?name=[name].[ext]!./mespeak_config.json");
 
 populateFormFromLocalStorage();
-
 const player = getPlayerFromLocalStorage();
 
-document.getElementById("settings-form").addEventListener("submit", function (event) {
-	event.preventDefault();
-
-	const playerField = (document.getElementById("player") as HTMLInputElement).value;
-	const isFemaleField = (document.getElementById("gender") as HTMLSelectElement).value;
-	const ttsEngineField = (document.getElementById("tts-engine") as HTMLSelectElement).value;
-	const awsRegionField = (document.getElementById("aws-region") as HTMLSelectElement).value;
-	const awsAccessKeyField = (document.getElementById("aws-accesskey") as HTMLInputElement).value;
-	const awsSecretKeyField = (document.getElementById("aws-secretkey") as HTMLInputElement).value;
-	const elevenlabsApiKeyField = (document.getElementById("elevenlabs-apikey") as HTMLInputElement).value;
-	const awsTtsEngineField = (document.getElementById("aws-ttsengine") as HTMLInputElement);
-	let neuralEngine = "false"
-	if (awsTtsEngineField.checked) neuralEngine = "true"
-
-	localStorage.setItem("player", playerField);
-	localStorage.setItem("isFemale", isFemaleField);
-	localStorage.setItem("ttsEngine", ttsEngineField);
-	localStorage.setItem("awsRegion", awsRegionField);
-	localStorage.setItem("awsAccessKey", awsAccessKeyField);
-	localStorage.setItem("awsSecretKey", awsSecretKeyField);
-	localStorage.setItem("elevenlabsapikey", elevenlabsApiKeyField);
-	localStorage.setItem("awsttsEngine", neuralEngine);
-
-	window.location.reload();
-});
-
-const form = document.getElementById("settings-form") as HTMLFormElement;
-const nameForm = document.getElementById("player") as HTMLInputElement;
-const genderSelect = document.getElementById("gender") as HTMLSelectElement;
-const select = document.getElementById("tts-engine") as HTMLSelectElement;
-const submitButton = form.querySelector(".formsubmit") as HTMLButtonElement;
-
-const awsElements = document.getElementsByClassName("aws") as HTMLCollectionOf<HTMLElement>;
-const elevenlabsElements = document.getElementsByClassName("elevenlabs") as HTMLCollectionOf<HTMLElement>;
-
-function handleSelectChange(addCtaClass = true) {
-	const selectedOption = select.value;
-
-	// Hide all AWS and Elevenlabs elements
-	for (let i = 0; i < awsElements.length; i++) {
-		awsElements[i].style.display = "none";
-	}
-	for (let i = 0; i < elevenlabsElements.length; i++) {
-		elevenlabsElements[i].style.display = "none";
-	}
-
-	// Show elements based on the selected option
-	if (selectedOption === "aws" || selectedOption === "elevenlabs") {
-		const elementsToDisplay = selectedOption === "aws" ? awsElements : elevenlabsElements;
-		for (let i = 0; i < elementsToDisplay.length; i++) {
-			elementsToDisplay[i].style.display = "";
-		}
-	}
-
-	if (addCtaClass) {
-		submitButton.classList.add("cta");
-	}
+interface FormElements {
+    [key: string]: HTMLInputElement | HTMLSelectElement;
 }
 
-function handleInputChange() {
-	submitButton.classList.add("cta");
-}
+const formIds = ["player", "gender", "ttsEngine", "awsRegion", "awsAccessKey", "awsSecretKey", "elevenlabsapikey", "awsttsEngine"];
+const elements: FormElements = formIds.reduce((acc: FormElements, id: string) => ({ ...acc, [id]: document.getElementById(id) as HTMLInputElement | HTMLSelectElement }), {});
 
-// Add event listeners to all input and select elements
-Array.from(form.querySelectorAll("input, select")).forEach((element: HTMLElement) => {
-	element.addEventListener("change", handleInputChange);
+const settingsForm = document.getElementById("settings-form") as HTMLFormElement;
+const settingsToggle = document.getElementById("settingsToggle") as HTMLElement;
+const settings = document.getElementById("settings") as HTMLElement;
+
+settingsForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    Object.entries(elements).forEach(([key, element]) => {
+        const value = (key === "awsttsEngine") ? (element as HTMLInputElement).checked.toString() : element.value;
+        localStorage.setItem(key, value);
+    });
+    window.location.reload();
 });
 
-nameForm.addEventListener("change", () => handleInputChange());
-select.addEventListener("change", () => handleSelectChange(true));
-genderSelect.addEventListener("change", () => handleSelectChange(true));
+const handleElementsVisibility = (elements: HTMLCollectionOf<HTMLElement>, display: string) => {
+    Array.from(elements).forEach((element: HTMLElement) => {
+        element.style.display = display;
+    });
+};
 
-// Call handleSelectChange initially to set the form state based on the initial select value, but don't add the cta class
+const handleInputChange = () => {
+    (settingsForm.querySelector(".formsubmit") as HTMLButtonElement).classList.add("cta");
+};
+
+const handleSelectChange = (addCtaClass = true) => {
+    const selectedOption = elements.ttsEngine.value;
+    handleElementsVisibility(document.getElementsByClassName("aws") as HTMLCollectionOf<HTMLElement>, "none");
+    handleElementsVisibility(document.getElementsByClassName("elevenlabs") as HTMLCollectionOf<HTMLElement>, "none");
+
+    if (selectedOption === "aws" || selectedOption === "elevenlabs") {
+        handleElementsVisibility(document.getElementsByClassName(selectedOption) as HTMLCollectionOf<HTMLElement>, "");
+    }
+    
+    if (addCtaClass) handleInputChange();
+};
+
+Array.from(settingsForm.querySelectorAll("input, select")).forEach((element: HTMLElement) => {
+    element.addEventListener("change", handleInputChange);
+    element.addEventListener("change", () => handleSelectChange(true));
+});
+
 handleSelectChange(false);
 
-window.setInterval(async () => {
-	try {
-		await capture(player);
-	} catch (error) {
-		console.error("Error capturing:", error);
-	}
+let captureInterval = window.setInterval(async () => {
+    try {
+        await capture(player);
+    } catch (error) {
+        console.error("Error capturing:", error);
+        window.clearInterval(captureInterval);
+    }
 }, 600);
 
-document.getElementById("settingsToggle").addEventListener("click", () => {
-	document.getElementById("settings").classList.toggle("hidden");
-	document.getElementById("settingsToggle").classList.toggle("active");
+settingsToggle.addEventListener("click", () => {
+    settings.classList.toggle("hidden");
+    settingsToggle.classList.toggle("active");
 });
 
 if (window.alt1) {
-	alt1.identifyAppUrl("./appconfig.json");
+    alt1.identifyAppUrl("./appconfig.json");
 }

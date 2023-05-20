@@ -7,7 +7,7 @@ var outdir = path.resolve(__dirname, "./dist/");
 
 var config = new alt1chain(srcdir, { ugly: false });
 
-config.makeUmd("testpackage", "TEST");
+// config.makeUmd("testpackage", "TEST");
 
 config.entry("index", "./index.ts");
 
