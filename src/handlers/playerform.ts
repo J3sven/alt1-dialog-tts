@@ -12,7 +12,7 @@ export function setFormListener() {
 }
 
 // Check if localStorage values are set and autopopulate the form
-export function populateFormFromLocalStorage() {
+export async function populateFormFromLocalStorage() {
     const storedPlayer = localStorage.getItem("player");
     const storedIsFemale = localStorage.getItem("isFemale");
     const storedTtsEngine = localStorage.getItem("ttsEngine");

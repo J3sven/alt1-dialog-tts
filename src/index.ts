@@ -3,6 +3,7 @@
 import { getPlayerFromLocalStorage } from "./handlers/self";
 import { populateFormFromLocalStorage } from "./handlers/playerform";
 import { capture } from "./handlers/capture";
+import { getXiCharactersRemaining } from "./handlers/xilabs";
 
 require("!file-loader?name=[name].[ext]!./index.html");
 require("!file-loader?name=[name].[ext]!./app.css");
@@ -90,9 +91,6 @@ genderSelect.addEventListener("change", () => handleSelectChange(true));
 // Call handleSelectChange initially to set the form state based on the initial select value, but don't add the cta class
 handleSelectChange(false);
 
-
-
-
 window.setInterval(async () => {
 	try {
 		await capture(player);
@@ -105,9 +103,6 @@ document.getElementById("settingsToggle").addEventListener("click", () => {
 	document.getElementById("settings").classList.toggle("hidden");
 	document.getElementById("settingsToggle").classList.toggle("active");
 });
-
-// statusDiv.insertAdjacentHTML("beforeend", `<h2 class="talker">Tester</h2>`);
-// statusDiv.insertAdjacentHTML("beforeend", `<p>lorem	ipsum dolor set amet we're finally here! Can you believe it?</p>`);
 
 if (window.alt1) {
 	alt1.identifyAppUrl("./appconfig.json");

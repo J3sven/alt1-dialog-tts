@@ -2,6 +2,7 @@ import * as AWS from 'aws-sdk';
 import { processString, stringExistsInJson } from './stringfunctions';
 import { loadGenderData } from './gender';
 import * as meSpeak from './meSpeak';
+import { getXiCharactersRemaining } from "./xilabs";
 
 const femaleNpcs = './femaleNpcs.json'
 var genderCache: { FemaleNpcs: string[] } | null = null;
@@ -217,7 +218,7 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
     }
 
     private async textToSpeech(text: string, voiceId: string): Promise<Response> {
-        const requestUrl = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
+        const requestUrl = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?optimize_streaming_latency=2`;
 
         const headers = {
             'Accept': 'audio/mpeg',
@@ -239,6 +240,10 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
             headers,
             body
         });
+
+        
+        let remainingCharacters = await getXiCharactersRemaining();
+        document.getElementById("currentEngine").append(" (" + remainingCharacters + ")");
 
         return response;
     }
