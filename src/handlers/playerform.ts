@@ -39,6 +39,11 @@ export async function populateFormFromLocalStorage() {
         if(storedTtsEngine === "elevenlabs") {
             let remainingCharacters = await getXiCharactersRemaining();
             document.getElementById("currentEngine").append(" (" + remainingCharacters + ")");
+        } else if (storedTtsEngine === "aws") {
+            document.getElementById("currentEngine").innerText = "Amazon Polly";
+            if (storedAwsttsEngine === "true"){
+                document.getElementById("currentEngine").append(" (Neural)");
+            }
         }
     } else{
         (document.getElementById("tts-engine") as HTMLSelectElement).value = "mespeak";
