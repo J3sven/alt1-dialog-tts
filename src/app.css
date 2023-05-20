@@ -186,7 +186,8 @@ button.active {
 
 .formgroup {
 	display: flex;
-	flex-direction: column
+	flex-direction: column;
+	padding-right: 60px;
 }
 
 .formgroup label {
