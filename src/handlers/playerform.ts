@@ -1,4 +1,5 @@
 import { capitalizeName } from "./stringfunctions";
+import { getXiCharactersRemaining } from "./xilabs";
 
 export function setFormListener() {
     document.getElementById("settings-form").addEventListener("submit", function (event) {
@@ -35,6 +36,8 @@ export async function populateFormFromLocalStorage() {
     if (storedTtsEngine !== null) {
         (document.getElementById("tts-engine") as HTMLSelectElement).value = storedTtsEngine;
         document.getElementById("currentEngine").innerText = capitalizeName(storedTtsEngine);
+        let remainingCharacters = await getXiCharactersRemaining();
+        document.getElementById("currentEngine").append(" (" + remainingCharacters + ")");
     } else{
         (document.getElementById("tts-engine") as HTMLSelectElement).value = "mespeak";
         document.getElementById("currentEngine").innerText =  "mespeak";
