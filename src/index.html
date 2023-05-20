@@ -1,127 +1,134 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="UTF-8">
-		<title>TTS app</title>
-		<link rel="stylesheet" href="app.css">
-	</head>
-	<body>
-		<header><strong>Dialogue TTS</strong> <button title="Settings" id="settingsToggle">⚙️</button></header>
-		<h3 id="currentEngine">mespeak</h3>
-		<div id="progress-bar" style="position: absolute; bottom: 5px; width: 82%; left: 9%; background-color: #3b4a56; height: 5px;">
-			<div id="progress" style="height: 100%; background-color: #d9a81e; width: 0%; transition: width 0.1s;"></div>
-		</div>
-		
 
-		<div id="settings" class="hidden">
-			<div class="formgroup volumeSettings">
-				<label title="Sound volume" for="volume">Audio volume</label>
-				<input type="range" id="volume" name="volume" min="0" max="1" step="0.01" value="1">
+<head>
+	<meta charset="UTF-8">
+	<title>TTS app</title>
+	<link rel="stylesheet" href="app.css">
+</head>
+
+<body>
+	<header><strong>Dialog TTS</strong> <button title="Settings" id="settingsToggle">⚙️</button></header>
+	<h3 id="currentEngine">mespeak</h3>
+	<div id="progress-bar"
+		style="position: absolute; bottom: 5px; width: 82%; left: 9%; background-color: #3b4a56; height: 5px;">
+		<div id="progress" style="height: 100%; background-color: #d9a81e; width: 0%; transition: width 0.1s;"></div>
+	</div>
+
+
+	<div id="settings" class="hidden">
+		<div class="formgroup volumeSettings">
+			<label title="Sound volume" for="volume">Audio volume</label>
+			<input type="range" id="volume" name="volume" min="0" max="1" step="0.01" value="1">
+		</div>
+
+		<form id="settings-form">
+			<div class="formgroup">
+				<label for="player">Player Name:</label>
+				<input type="text" id="player" name="player" required>
 			</div>
-			
-			<form id="settings-form">
-				<div class="formgroup">
-					<label for="player">Player Name:</label>
-					<input type="text" id="player" name="player" required>
-				</div>
-				
-				<div class="formgroup gender">
-					<label for="gender">Player Voice:</label>
-					<select id="gender" name="gender" required>
-						<option value="false">Male</option>
-						<option value="true">Female</option>
-					</select>
-				</div>
 
-				<div class="formgroup tts">
-					<label for="tts-engine">TTS Engine</label>
-					<select name="tts-engine" id="ttsEngine" required>
-						<option value="mespeak">meSpeak (default)</option>
-						<option value="aws">Amazon Polly</option>
-						<option value="elevenlabs">Elevenlabs</option>
-					</select>
-				</div>
-				
-				<div class="formgroup elevenlabs elevenlabs-apikey" style="display: none;">
-					<label for="elevenlabs-apikey">Elevenlabs API key</label>
-					<input type="password" id="elevenlabsapikey" name="elevenlabs-apikey">
-				</div>
+			<div class="formgroup gender">
+				<label for="gender">Player Voice:</label>
+				<select id="gender" name="gender" required>
+					<option value="false">Male</option>
+					<option value="true">Female</option>
+				</select>
+			</div>
 
-				<div class="formgroup aws" style="display: none;">
-					<p>Amazon Polly credentials</p>
-				</div>
+			<div class="formgroup tts">
+				<label for="tts-engine">TTS Engine</label>
+				<select name="tts-engine" id="ttsEngine" required>
+					<option value="mespeak">meSpeak (default)</option>
+					<option value="aws">Amazon Polly</option>
+					<option value="elevenlabs">Elevenlabs</option>
+				</select>
+			</div>
 
-				<div class="formgroup aws-region aws" style="display: none;">
-					<label for="aws-region">Region</label>
+			<div class="formgroup elevenlabs elevenlabs-apikey" style="display: none;">
+				<label for="elevenlabs-apikey">Elevenlabs API key</label>
+				<input type="password" id="elevenlabsapikey" name="elevenlabs-apikey">
+			</div>
+
+			<div class="formgroup aws" style="display: none;">
+				<p>Amazon Polly credentials</p>
+			</div>
+
+			<div class="formgroup aws-region aws" style="display: none;">
+				<label for="aws-region">Region</label>
+				<select id="awsRegion" name="aws-region">
 					<select id="awsRegion" name="aws-region">
-						<option value="us-west-2">US West (Oregon) Region</option>
-						<option value="us-east-1">US East (Northern Virginia) Region</option>
-						<option value="us-west-1">US West (Northern California) Region</option>
-						<option value="us-east-2">US East (Ohio) Region</option>
-						<option value="ca-central-1">Canada (Central) Region</option>
-						<option value="us-gov-west-1">GovCloud (US-West) Region</option>
-						<option value="us-gov-east-1">GovCloud (US-East) Region</option>
-						<option value="sa-east-1">South America (São Paulo) Region</option>
-						<option value="eu-west-1">Europe (Ireland) Region</option>
-						<option value="eu-central-1">Europe (Frankfurt) Region</option>
-						<option value="eu-west-2">Europe (London) Region</option>
-						<option value="eu-west-3">Europe (Paris) Region</option>
-						<option value="eu-north-1">Europe (Stockholm) Region</option>
-						<option value="eu-south-1">Europe (Milan) Region</option>
-						<option value="eu-west-6">Europe (Zurich) Region</option>
-						<option value="eu-west-7">Europe (Spain) Region</option>
-						<option value="me-south-1">Middle East (Bahrain) Region</option>
-						<option value="me-south-2">Middle East (UAE) Region</option>
-						<option value="af-south-1">Africa (Cape Town) Region</option>
-						<option value="ap-southeast-1">Asia Pacific (Singapore) Region</option>
-						<option value="ap-northeast-1">Asia Pacific (Tokyo) Region</option>
-						<option value="ap-northeast-2">Asia Pacific (Seoul) Region</option>
-						<option value="ap-south-1">Asia Pacific (Mumbai) Region</option>
-						<option value="ap-east-1">Asia Pacific (Hong Kong) Region</option>
-						<option value="ap-northeast-3">Asia Pacific (Osaka) Region</option>
-						<option value="ap-southeast-3">Asia Pacific (Jakarta) Region</option>
-						<option value="ap-south-2">AWS Asia Pacific (Hyderabad) Region</option>
-						<option value="cn-north-1">Mainland China (Beijing) Region</option>
-						<option value="cn-northwest-1">Mainland China (Ningxia) Region</option>
-						<option value="ap-southeast-2">Australia (Sydney) Region</option>
-						<option value="ap-southeast-4">Asia Pacific (Melbourne) Region</option>
-					  </select>
-					  
-				</div>
-				<div class="formgroup aws aws-accesskey" style="display: none;">
-					<label for="aws-accesskey">AWS Access key</label>
-					<input type="text" id="awsAccessKey" name="aws-accesskey">
-				</div>
+						<option value="af-south-1">af-south-1 (Africa, Cape Town)</option>
+						<option value="ap-east-1">ap-east-1 (Asia Pacific, Hong Kong)</option>
+						<option value="ap-northeast-1">ap-northeast-1 (Asia Pacific, Tokyo)</option>
+						<option value="ap-northeast-2">ap-northeast-2 (Asia Pacific, Seoul)</option>
+						<option value="ap-northeast-3">ap-northeast-3 (Asia Pacific, Osaka)</option>
+						<option value="ap-south-1">ap-south-1 (Asia Pacific, Mumbai)</option>
+						<option value="ap-south-2">ap-south-2 (AWS Asia Pacific, Hyderabad)</option>
+						<option value="ap-southeast-1">ap-southeast-1 (Asia Pacific, Singapore)</option>
+						<option value="ap-southeast-2">ap-southeast-2 (Australia, Sydney)</option>
+						<option value="ap-southeast-3">ap-southeast-3 (Asia Pacific, Jakarta)</option>
+						<option value="ap-southeast-4">ap-southeast-4 (Asia Pacific, Melbourne)</option>
+						<option value="ca-central-1">ca-central-1 (Canada Central, Canada)</option>
+						<option value="cn-north-1">cn-north-1 (Mainland China, Beijing)</option>
+						<option value="cn-northwest-1">cn-northwest-1 (Mainland China, Ningxia)</option>
+						<option value="eu-central-1">eu-central-1 (Europe, Frankfurt)</option>
+						<option value="eu-north-1">eu-north-1 (Europe, Stockholm)</option>
+						<option value="eu-south-1">eu-south-1 (Europe, Milan)</option>
+						<option value="eu-west-1">eu-west-1 (Europe, Ireland)</option>
+						<option value="eu-west-2">eu-west-2 (Europe, London)</option>
+						<option value="eu-west-3">eu-west-3 (Europe, Paris)</option>
+						<option value="eu-west-6">eu-west-6 (Europe, Zurich)</option>
+						<option value="eu-west-7">eu-west-7 (Europe, Spain)</option>
+						<option value="me-south-1">me-south-1 (Middle East, Bahrain)</option>
+						<option value="me-south-2">me-south-2 (Middle East, UAE)</option>
+						<option value="sa-east-1">sa-east-1 (South America, São Paulo)</option>
+						<option value="us-east-1">us-east-1 (US East, Northern Virginia)</option>
+						<option value="us-east-2">us-east-2 (US East, Ohio)</option>
+						<option value="us-gov-east-1">us-gov-east-1 (GovCloud US-East)</option>
+						<option value="us-gov-west-1">us-gov-west-1 (GovCloud US-West)</option>
+						<option value="us-west-1">us-west-1 (US West, Northern California)</option>
+						<option value="us-west-2">us-west-2 (US West, Oregon)</option>
+					</select>
 
-				<div class="formgroup aws aws-secretkey" style="display: none;">
-					<label for="aws-secretkey">AWS Secret key</label>
-					<input type="password" id="awsSecretKey" name="aws-secretkey">
-				</div>
+				</select>
 
-				<div class="formgroup aws aws-ttsengine" style="display: none;">
-					<label for="aws-ttsengine">Neural engine</label>
-					<input type="checkbox" name="aws-ttsengine" id="awsttsEngine">
-				</div>
+			</div>
+			<div class="formgroup aws aws-accesskey" style="display: none;">
+				<label for="aws-accesskey">AWS Access key</label>
+				<input type="text" id="awsAccessKey" name="aws-accesskey">
+			</div>
 
-				<div class="formgroup">
-					<button class="formsubmit" type="submit">Save</button>
-				</div>
-			</form>
+			<div class="formgroup aws aws-secretkey" style="display: none;">
+				<label for="aws-secretkey">AWS Secret key</label>
+				<input type="password" id="awsSecretKey" name="aws-secretkey">
+			</div>
 
-		</div>
-		<main>
-			<div id="status"></div>
-		</main>
-		<div class="settings-saved">Settings saved!</div>
-		<script src="https://sdk.amazonaws.com/js/aws-sdk-2.1378.0.min.js"></script>
-		<script>
-			var global = global || window;
-			var Buffer = Buffer || [];
-			var process = process || {
-			  env: { DEBUG: undefined },
-			  version: []
-			};
-		  </script>
-		<script src="./index.bundle.js"></script>
-	</body>
+			<div class="formgroup aws aws-ttsengine" style="display: none;">
+				<label for="aws-ttsengine">Neural engine</label>
+				<input type="checkbox" name="aws-ttsengine" id="awsttsEngine">
+			</div>
+
+			<div class="formgroup">
+				<button class="formsubmit" type="submit">Save</button>
+			</div>
+		</form>
+
+	</div>
+	<main>
+		<div id="status"></div>
+	</main>
+	<div class="settings-saved">Settings saved!</div>
+	<script src="https://sdk.amazonaws.com/js/aws-sdk-2.1378.0.min.js"></script>
+	<script>
+		var global = global || window;
+		var Buffer = Buffer || [];
+		var process = process || {
+			env: { DEBUG: undefined },
+			version: []
+		};
+	</script>
+	<script src="./index.bundle.js"></script>
+</body>
+
 </html>

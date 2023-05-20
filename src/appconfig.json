@@ -1,5 +1,5 @@
 {
-	"appName": "Dialog Text to Speech",
+	"appName": "Dialog TTS",
 	"description": "Alt1 app that parses dialog boxes to various text to speech engines",
 	"appUrl": "./index.html",
 	"configUrl": "./appconfig.json",
