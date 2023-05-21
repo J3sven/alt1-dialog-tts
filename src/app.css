@@ -219,7 +219,7 @@ button.formsubmit {
 	bottom: 25px;
 	width: 150px;
 	padding: 9px;
-	z-index: 10;
+	z-index: -1;
 	border-radius: 5px;
 	background: #29b729;
 	text-align: center;
@@ -238,16 +238,19 @@ button.formsubmit {
 
 @keyframes slide-fade {
 	0% {
+		z-index: 10;
 		opacity: 0;
 		transform: translateY(25px);
 	}
 
 	50% {
+		z-index: 10;
 		opacity: 1;
 		transform: translateY(-25px);
 	}
 
 	100% {
+		z-index: 10;
 		opacity: 0;
 		transform: translateY(25px);
 	}
