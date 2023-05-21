@@ -71,22 +71,23 @@ const fNamesSet: Set<string> = new Set([
     "FXAMINER",
     "THE FXILE",
     "FZREAL"
-  ]);
-  
-  export function processNameString(inputString: string): string {
+]);
+
+export function processNameString(inputString: string): string {
     const semicolonPeriodRegex = /;./g;
     let upperCaseString = inputString.toUpperCase();
-    const fixEbug = upperCaseString.replace(semicolonPeriodRegex, 'E');
-    let result = fixEbug;
+    let result = upperCaseString.replace(semicolonPeriodRegex, 'E');
     if (fNamesSet.has(upperCaseString)) {
-        result =  'E' + fixEbug.substring(1);
+        result = 'E' + result.substring(1);
     }
     return result;
-  }
-  
+}
+
+
 
 
 export function capitalizeName(str: string): string {
+    str = processNameString(str);
     return str
         .toLowerCase()
         .split(' ')

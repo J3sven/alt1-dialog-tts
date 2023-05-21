@@ -1,5 +1,5 @@
 import * as AWS from 'aws-sdk';
-import { processString, stringExistsInJson } from './stringfunctions';
+import { processString, stringExistsInJson, processNameString } from './stringfunctions';
 import { loadGenderData } from './gender';
 import * as meSpeak from './meSpeak';
 import { getXiCharactersRemaining } from "./xilabs";
@@ -58,7 +58,7 @@ export abstract class TextToSpeech<T> {
         let genderVoice = this.maleVoice;
 
         const jsonData = await loadGenderData(femaleNpcs, genderCache);
-        if (stringExistsInJson(name.toUpperCase(), jsonData)) genderVoice = this.femaleVoice;
+        if (stringExistsInJson(processNameString(name), jsonData)) genderVoice = this.femaleVoice;
 
         if (name === player.self && player.selfFemale) genderVoice = this.femaleVoice;
 
