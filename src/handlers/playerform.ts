@@ -7,7 +7,7 @@ export function setFormListener() {
     document.getElementById("settings-form").addEventListener("submit", (event) => {
         event.preventDefault();
         localStorage.setItem("player", (document.getElementById("player") as HTMLInputElement).value);
-        localStorage.setItem("isFemale", (document.getElementById("gender") as HTMLSelectElement).value);
+        localStorage.setItem("isFemale", (document.getElementById("isFemale") as HTMLSelectElement).value);
     });
 }
 

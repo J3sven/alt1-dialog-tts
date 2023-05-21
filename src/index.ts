@@ -16,7 +16,7 @@ interface FormElements {
     [key: string]: HTMLInputElement | HTMLSelectElement;
 }
 
-const formIds = ["player", "gender", "ttsEngine", "awsRegion", "awsAccessKey", "awsSecretKey", "elevenlabsapikey", "awsttsEngine"];
+const formIds = ["player", "isFemale", "ttsEngine", "awsRegion", "awsAccessKey", "awsSecretKey", "elevenlabsapikey", "awsttsEngine"];
 const elements: FormElements = formIds.reduce((acc: FormElements, id: string) => ({ ...acc, [id]: document.getElementById(id) as HTMLInputElement | HTMLSelectElement }), {});
 
 const settingsForm = document.getElementById("settings-form") as HTMLFormElement;
