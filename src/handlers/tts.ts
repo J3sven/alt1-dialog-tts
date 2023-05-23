@@ -4,6 +4,7 @@ import { loadGenderData } from './gender';
 import * as meSpeak from './meSpeak';
 import { getXiCharactersRemaining } from "./xilabs";
 import { gsap } from 'gsap';
+import {Md5} from 'ts-md5';
 
 const femaleNpcs = './femaleNpcs.json'
 var genderCache: { FemaleNpcs: string[] } | null = null;
@@ -62,12 +63,18 @@ export abstract class TextToSpeech<T> {
 
         if (name === player.self && player.selfFemale) genderVoice = this.femaleVoice;
 
-        await this.processSpeech(text, genderVoice);
+        if (name === player.self  && player.selfFemale){ 
+            name = 'player-female'
+        } else if (name === player.self && !player.selfFemale){
+            name = 'player-male'
+        }
+
+        await this.processSpeech(text, genderVoice, name.toUpperCase());
     }
 
     protected abstract isInAudioQueue(text: string): boolean;
 
-    protected abstract processSpeech(text: string, genderVoice: string): Promise<void>;
+    protected abstract processSpeech(text: string, genderVoice: string, name:string): Promise<void>;
 }
 
 
@@ -222,22 +229,63 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
         return this.audioQueue.includes(text);
     }
 
-    protected async processSpeech(text: string, voiceId: string): Promise<void> {
+    protected async postAudio(hash: string, audio: Blob, name: string): Promise<void> {
+        console.log('Posting audio to Eleven Labs API')
         try {
-            const response = await this.textToSpeech(text, voiceId);
+            const formData = new FormData();
+            formData.append('file', audio, `${hash}.mp3`);
+        
+            const response = await fetch(`http://api.j3.gg/audio/${name}/${hash}`, {
+                method: 'POST',
+                body: formData,
+            });
+        
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`Failed to post audio. HTTP error! status: ${response.status}`);
             }
-            const audioContent = await response.blob();
+        } catch (error) {
+            console.error('Error while posting audio:', error);
+        }
+    }
+
+    protected async processSpeech(text: string, voiceId: string, name:string): Promise<void> {
+        const hash = Md5.hashStr(voiceId + text);
+        console.log('Processing speech:', text, 'with hash:', hash)
+    
+        try {
+            let response = await fetch(`http://api.j3.gg/audio/${name}/${hash}`);
+            console.log('Response:', response)
+            let audioContent;
+    
+            if (!response.ok) {
+                console.log('Audio not found in cache, generating new audio')
+                // If the audio isn't found in cache, generate new audio
+                response = await this.textToSpeech(text, voiceId);
+    
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+    
+                audioContent = await response.blob();
+                
+                // Cache the new audio for future use
+                this.postAudio(hash, audioContent, name);
+            } else {
+                console.log('Audio found in cache')
+                audioContent = await response.blob();
+            }
+    
             const audioSrc = URL.createObjectURL(audioContent);
             this.audioQueue.push(audioSrc);
+    
             if (!this.isPlaying) {
                 await this.playNext();
             }
         } catch (error) {
-            console.error('Error while fetching Eleven Labs TTS API:', error);
+            console.error('Error while processing speech:', error);
         }
     }
+    
 
     private async textToSpeech(text: string, voiceId: string): Promise<Response> {
         const requestUrl = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?optimize_streaming_latency=2`;

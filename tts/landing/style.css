@@ -1,0 +1,118 @@
+:root{
+  font-family: 'Ubuntu Mono', monospace;
+}
+
+.flex-vh{
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  height: 75vh;
+}
+
+.center{
+  justify-content: center;
+  text-align: center;
+}
+
+h1{
+  color: black;
+  font-size: 6rem;
+  animation: RBtext 800ms linear;
+  text-shadow: 3px 3px 0 #40c0e7, -3px -3px 0 #e70b60;
+}
+
+a{
+  color: black;
+  text-decoration: none;
+  font-size: 26px;
+  margin-right: 25px;
+}
+
+a:hover{
+  color: black;
+  text-shadow: -1px -1px 0 #40c0e7, 1px 1px 0 #e70b60;
+}
+
+.animated a:last-child{
+  margin-right: 0 !important;
+}
+
+@keyframes RBtext {
+  0%, 100% {
+    text-shadow: -2px -2px 0 #40c0e7, 2px 2px 0 #e70b60;
+  }
+  
+  25% {
+    text-shadow: 2px 2px 0 #40c0e7, -2px -2px 0 #e70b60;
+  }
+  
+  50% {
+    text-shadow: 2px -2px 0 #40c0e7, -2px 2px 0 #e70b60;
+  }
+  
+  75% {
+    text-shadow: -2px 2px 0 #40c0e7, 2px -2px 0 #e70b60;
+  }
+  
+  100% {
+    text-shadow: 3px 3px 0 #40c0e7, -3px -3px 0 #e70b60;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+      transform: translate3d(0,40px,0)
+  }
+
+  to {
+      transform: translate3d(0,0,0);
+      opacity: 1
+  }
+}
+
+@-webkit-keyframes fadeInUp {
+  from {
+      transform: translate3d(0,40px,0)
+  }
+
+  to {
+      transform: translate3d(0,0,0);
+      opacity: 1
+  }
+}
+
+.animated {
+  animation-delay: 800ms;
+  animation-duration: 200ms;
+  animation-fill-mode: both;
+  -webkit-animation-duration: 1s;
+  -webkit-animation-fill-mode: both
+}
+
+.animatedFadeInUp {
+  opacity: 0
+}
+
+.fadeInUp {
+  opacity: 0;
+  animation-name: fadeInUp;
+  -webkit-animation-name: fadeInUp;
+}
+
+@media (prefers-color-scheme: dark) {
+  body{
+    background-color: black;
+    color: white;
+  }
+  h1{
+    color: white;
+  }
+  a{
+    color: white;
+    text-decoration: none;
+  }
+  a:hover{
+    color: white;
+  }
+}
