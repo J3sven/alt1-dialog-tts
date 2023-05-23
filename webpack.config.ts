@@ -7,7 +7,7 @@ var outdir = path.resolve(__dirname, "./dist/");
 
 var config = new alt1chain(srcdir, { ugly: false });
 
-config.entry("index", "./index.ts");
+config.entry("tts/index", "./index.ts");
 
 config.output(outdir);
 
@@ -16,7 +16,7 @@ config.chain.plugin('copy-webpack-plugin')
     .use(CopyWebpackPlugin, [{
       patterns: [
         { from: path.resolve(__dirname, './src/voices'), to: 'tts/voices' }, // Move voices to ./dist/tts/voices
-        { from: path.resolve(__dirname, './src'), to: 'tts', globOptions: { ignore: ['**/landing/**'] } }, // Copy contents of ./src excluding ./src/landing to ./dist/tts
+        { from: path.resolve(__dirname, './src'), to: 'tts', globOptions: { ignore: ['**/landing/**', '**/voices/**'] } }, // Copy contents of ./src excluding ./src/landing and ./src/voices to ./dist/tts
         { from: path.resolve(__dirname, './src/landing'), to: './' }, // Copy contents of ./src/landing to ./dist
       ],
     }]);
