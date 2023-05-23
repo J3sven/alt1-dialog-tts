@@ -235,7 +235,7 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
             const formData = new FormData();
             formData.append('file', audio, `${hash}.mp3`);
         
-            const response = await fetch(`http://api.j3.gg/audio/${name}/${hash}`, {
+            const response = await fetch(`https://api.j3.gg/audio/${name}/${hash}`, {
                 method: 'POST',
                 body: formData,
             });
@@ -253,7 +253,7 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
         console.log('Processing speech:', text, 'with hash:', hash)
     
         try {
-            let response = await fetch(`http://api.j3.gg/audio/${name}/${hash}`);
+            let response = await fetch(`https://api.j3.gg/audio/${name}/${hash}`);
             console.log('Response:', response)
             let audioContent;
     
