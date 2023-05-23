@@ -61,6 +61,8 @@ export abstract class TextToSpeech<T> {
         const jsonData = await loadGenderData(femaleNpcs, genderCache);
         if (stringExistsInJson(processNameString(name), jsonData)) genderVoice = this.femaleVoice;
 
+        console.log('name', name, 'player', player.self, 'player.selfFemale', player.selfFemale)
+
         if (name === player.self && player.selfFemale) genderVoice = this.femaleVoice;
 
         if (name === player.self  && player.selfFemale){ 

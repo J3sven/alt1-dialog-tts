@@ -12,5 +12,5 @@ export function definePlayer(playerName: string | null, female: boolean | null) 
 export function getPlayerFromLocalStorage(): ReturnType<typeof definePlayer> {
     const playerName = localStorage.getItem("player");
     const isFemale = JSON.parse(localStorage.getItem("isFemale") as string);
-    return definePlayer(playerName, isFemale);
+    return definePlayer(playerName.toUpperCase(), isFemale);
 }

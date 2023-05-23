@@ -23,7 +23,7 @@ export async function capture(player:any) {
 
 	if (dialogBool) {
 		let [name, dialogText] = [dialog.readTitle(img), dialog.readDialog(img, dialog.checkDialog(img))].map(v => processString(String(v)));
-		if (dialogText !== "null") tts.speak(dialogText, name, player);
+		if (dialogText !== "null") tts.speak(dialogText, name.toUpperCase(), player);
 
 		statusDiv.innerHTML = `<h2 class="talker">${capitalizeName(name)}</h2><p>${dialogText}</p>`;
 	} else {
