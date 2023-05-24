@@ -74,12 +74,12 @@ const fNamesSet: Set<string> = new Set([
 ]);
 
 export function processNameString(inputString: string): string {
-    const semicolonPeriodRegex = /;./g;
-    let upperCaseString = inputString.toUpperCase();
-    let result = upperCaseString.replace(semicolonPeriodRegex, 'E');
-    if (fNamesSet.has(upperCaseString)) {
-        result = 'E' + result.substring(1);
-    }
+    // const semicolonPeriodRegex = /;./g;
+    let result = inputString.toUpperCase();
+    // let result = upperCaseString.replace(semicolonPeriodRegex, 'E');
+    // if (fNamesSet.has(upperCaseString)) {
+    //     result = 'E' + result.substring(1);
+    // }
     return result;
 }
 
