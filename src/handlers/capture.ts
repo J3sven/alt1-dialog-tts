@@ -1,7 +1,7 @@
 import * as a1lib from "@alt1/base";
 import DialogReader from "@alt1/dialog"
 import { AwsTextToSpeech, MeSpeakTextToSpeech, ElevenLabsTextToSpeech } from "./tts";
-import { processString, capitalizeName } from "./stringfunctions";
+import { processString, capitalizeName, filterName } from "./stringfunctions";
 
 const dialog = new DialogReader();
 var statusDiv = document.getElementById("status");
@@ -23,8 +23,9 @@ export async function capture(player:any) {
 
 	if (dialogBool) {
 		let [name, dialogText] = [dialog.readTitle(img), dialog.readDialog(img, dialog.checkDialog(img))].map(v => processString(String(v)));
-		if (dialogText !== "null") tts.speak(dialogText, name.toUpperCase(), player);
-
+		if (dialogText == "null") return
+		dialogText = filterName(dialogText, player.self.toUpperCase(), name.toUpperCase())
+		tts.speak(dialogText, name.toUpperCase(), player);
 		statusDiv.innerHTML = `<h2 class="talker">${capitalizeName(name)}</h2><p>${dialogText}</p>`;
 	} else {
 		if (tts.isPlaying) {

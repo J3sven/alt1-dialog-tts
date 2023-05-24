@@ -53,6 +53,7 @@ export abstract class TextToSpeech<T> {
             return;
         }
 
+        console.log("speak", text);
 
         this.lastProcessedString = text;
 

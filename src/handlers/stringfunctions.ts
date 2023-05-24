@@ -74,16 +74,35 @@ const fNamesSet: Set<string> = new Set([
 ]);
 
 export function processNameString(inputString: string): string {
-    // const semicolonPeriodRegex = /;./g;
     let result = inputString.toUpperCase();
-    // let result = upperCaseString.replace(semicolonPeriodRegex, 'E');
-    // if (fNamesSet.has(upperCaseString)) {
-    //     result = 'E' + result.substring(1);
-    // }
     return result;
 }
 
-
+export function filterName(text: string, name: string, player: string): string {
+    console.log("filterName", text, name, player)
+    const nameContexts: string[] = ["my name is", "I'm", "i am", "this is", "you are", "they call me", "people know me as"];
+    const adventurerReplacements: {[index: string]: string} = {
+        "my name is": "I am an adventurer",
+        "I'm": "I am an adventurer",
+        "i am": "I am an adventurer",
+        "this is": "This is an adventurer",
+        "you are": "You are an adventurer",
+        "they call me": "They call me adventurer",
+        "people know me as": "People know me as an adventurer",
+    };
+    
+    if (player === name) {
+        for (let context of nameContexts) {
+            const regExp = new RegExp(`(${context}\\s${name})`, 'gi');
+            text = text.replace(regExp, adventurerReplacements[context]);
+        }
+    }
+    else {
+        const regExp = new RegExp(`${name}`, 'gi');
+        text = text.replace(regExp, "adventurer");
+    }
+    return text;
+}
 
 
 export function capitalizeName(str: string): string {
