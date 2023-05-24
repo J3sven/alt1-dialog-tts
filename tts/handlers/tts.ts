@@ -1,5 +1,5 @@
 import * as AWS from 'aws-sdk';
-import { processString, stringExistsInJson, processNameString } from './stringfunctions';
+import { processString, stringExistsInJson, processNameString, fixPhonetics } from './stringfunctions';
 import { loadGenderData } from './gender';
 import * as meSpeak from './meSpeak';
 import { getXiCharactersRemaining } from "./xilabs";
@@ -69,7 +69,7 @@ export abstract class TextToSpeech<T> {
             name = 'player-male'
         }
 
-        await this.processSpeech(text, genderVoice, name.toUpperCase());
+        await this.processSpeech(fixPhonetics(text), genderVoice, name.toUpperCase());
     }
 
     protected abstract isInAudioQueue(text: string): boolean;

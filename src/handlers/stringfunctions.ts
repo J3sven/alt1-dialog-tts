@@ -1,4 +1,4 @@
-
+import { phoneticsMap } from "./phonetics/phoneticsmap";
 
 export function stringExistsInJson(searchString: string, jsonData: { FemaleNpcs: string[] }): boolean {
     for (const str of jsonData.FemaleNpcs) {
@@ -19,67 +19,12 @@ export function processString(inputString) {
     return result;
 }
 
-const fNamesSet: Set<string> = new Set([
-    "FADBURG",
-    "FASTER BUNNY",
-    "FDDA",
-    "FDINA",
-    "FFARITAY",
-    "FILWYNN",
-    "FIR",
-    "FIRA",
-    "FIRLYS",
-    "FLDER RUNE FANATIC",
-    "FLEN ANTERTH",
-    "FLENA",
-    "FLENA SUERTEN",
-    "FLF GIRL",
-    "FLFINLOCKS",
-    "FLIDINIS",
-    "FLISABETA",
-    "FLISE",
-    "FLISSA",
-    "FLIZA",
-    "FLIZABETH",
-    "FLLAMARIA",
-    "FLLENA",
-    "FLLY THE CAMEL",
-    "FLSIE",
-    "FLUNED",
-    "FLVARG",
-    "FLVEN RECRUITER",
-    "FLZIK",
-    "FMBER",
-    "FMILEE",
-    "FMILIA",
-    "FMILY",
-    "FMLYN",
-    "FNAKHRA",
-    "FNDWYR, EMISSARY OF SEREN",
-    "FRITONA THE GREEN",
-    "FRYSAIL THE PIOUS",
-    "FSHE",
-    "FSSIANDAR GAR",
-    "FSSJAY",
-    "FSTRITH",
-    "FTHEREAL LADY",
-    "FTTA STONE",
-    "FTUYA",
-    "FVA",
-    "FVEY",
-    "FVIL NIYA",
-    "FXAMINER",
-    "THE FXILE",
-    "FZREAL"
-]);
-
 export function processNameString(inputString: string): string {
     let result = inputString.toUpperCase();
     return result;
 }
 
 export function filterName(text: string, name: string, player: string): string {
-    console.log("filterName", text, name, player)
     const nameContexts: string[] = ["my name is", "I'm", "i am", "this is", "you are", "they call me", "people know me as"];
     const adventurerReplacements: {[index: string]: string} = {
         "my name is": "I am an adventurer",
@@ -104,7 +49,6 @@ export function filterName(text: string, name: string, player: string): string {
     return text;
 }
 
-
 export function capitalizeName(str: string): string {
     str = processNameString(str);
     return str
@@ -113,3 +57,16 @@ export function capitalizeName(str: string): string {
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
 }
+
+export function fixPhonetics(text: string): string {
+    // Regular expression to split text into words, preserving punctuation.
+    const words = text.split(/(\b\w+\b)/g);
+
+    for (let i = 0; i < words.length; i++) {
+      const word = words[i].toLowerCase();
+      if (phoneticsMap.hasOwnProperty(word)) {
+        words[i] = phoneticsMap[word];
+      }
+    }
+    return words.join('');
+  }
