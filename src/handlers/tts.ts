@@ -321,6 +321,7 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
         }
 
         const hash = Md5.hashStr(voiceId + text);
+        console.log(text)
 
         try {
             let response = await fetch(`https://api.j3.gg/audio/${name}/${hash}`);

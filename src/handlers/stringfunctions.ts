@@ -59,6 +59,7 @@ export function capitalizeName(str: string): string {
 }
 
 export function fixPhonetics(text: string): string {
+    text = fixSlayer(text);
     // Regular expression to split text into words, preserving punctuation.
     const words = text.split(/(\b\w+\b)/g);
 
@@ -69,4 +70,14 @@ export function fixPhonetics(text: string): string {
       }
     }
     return words.join('');
+  }
+
+  function fixSlayer(input: string): string {
+    const precedingText = "Your new task is to kill ";
+    if (input.includes(precedingText)) {
+      const regex = /\d+\s/g;
+      const updatedString = input.replace(regex, "");
+      return updatedString;
+    }
+    return input;
   }
