@@ -22,5 +22,16 @@ export const phoneticsMap: { [word: string]: string; } = {
     "Charos": "Car-ross",
     "Drezel": "Drez-ell",
     "Duke Horacio": "Duke Hor-ah-see-oh",
+    "forinthry": "for-in-three",
+    "Zemouregal": "Zem-oh-ree-gal",
+    "Zaros": "Zar-ross",
+    "Zanik": "Zan-ick",
+    "Zanaris": "Zan-ah-riss",
+    "Zamorakian": "Zam-oh-rack-ee-an",
+    "Zamorakians": "Zam-oh-rack-ee-ans",
+    "Zarosian": "Zar-oh-see-an",
+    "Zarosians": "Zar-oh-see-ans",
+    "Mahjarrat": "Mah-jar-at",
+    "Icthlarin": "Ik-thlar-in",
   };
   
