@@ -4,9 +4,9 @@ import { loadGenderData } from './gender';
 import * as meSpeak from './meSpeak';
 import { getXiCharactersRemaining } from "./xilabs";
 import { gsap } from 'gsap';
-import {Md5} from 'ts-md5';
+import { Md5 } from 'ts-md5';
 
-const femaleNpcs = './femaleNpcs.json'
+const femaleNpcs = './data/femaleNpcs.json'
 var genderCache: { FemaleNpcs: string[] } | null = null;
 
 export abstract class TextToSpeech<T> {
@@ -16,6 +16,11 @@ export abstract class TextToSpeech<T> {
     protected femaleVoice: string;
     protected maleVoice: string;
     public audioVolume: number = 1;
+
+    protected async isFemale(name: string): Promise<boolean> {
+        const jsonData = await loadGenderData(femaleNpcs, genderCache);
+        return stringExistsInJson(processNameString(name), jsonData);
+    }
 
     public updateProgress(ratio: number): void {
         const progressBar = document.getElementById('progress') as HTMLElement;
@@ -53,33 +58,85 @@ export abstract class TextToSpeech<T> {
             return;
         }
 
-        console.log("speak", text);
-
         this.lastProcessedString = text;
 
         let genderVoice = this.maleVoice;
-
-        const jsonData = await loadGenderData(femaleNpcs, genderCache);
-        if (stringExistsInJson(processNameString(name), jsonData)) genderVoice = this.femaleVoice;
-
-        console.log('name', name, 'player', player.self, 'player.selfFemale', player.selfFemale)
-
-        if (name === player.self && player.selfFemale) genderVoice = this.femaleVoice;
-
-        if (name === player.self  && player.selfFemale){ 
-            name = 'player-female'
-        } else if (name === player.self && !player.selfFemale){
-            name = 'player-male'
+        if(this.isFemale(name)){
+            genderVoice = this.femaleVoice;
         }
+
+        // console.log('name', name, 'player', player.self, 'player.selfFemale', player.selfFemale)
+
+        if (name === player.self) {
+            if (player.selfFemale) {
+                genderVoice = this.femaleVoice;
+                name = 'player-female';
+            } else {
+                name = 'player-male';
+            }
+        }        
 
         await this.processSpeech(fixPhonetics(text), genderVoice, name.toUpperCase());
     }
 
     protected abstract isInAudioQueue(text: string): boolean;
 
-    protected abstract processSpeech(text: string, genderVoice: string, name:string): Promise<void>;
-}
+    protected abstract processSpeech(text: string, genderVoice: string, name: string): Promise<void>;
 
+
+    protected async getVoiceId(name: string, isMale: boolean): Promise<string> {
+        console.log ('getVoiceId', name, isMale);
+        let voiceId = '';
+
+        const maleVoiceIds = [
+            "ErXwobaYiN019PkySvjV",
+            "TxGEqnHWrfWFTfGW9XjX",
+            "VR6AewLTigWG4xSOukaG",
+            "pNInz6obpgDQGcFmaJgB",
+            "yoZ06aMxZJJ28mfd3POQ"
+        ];
+
+        const femaleVoiceIds = [
+            "21m00Tcm4TlvDq8ikWAM",
+            "AZnzlk1XvdvUeBnXmlld",
+            "EXAVITQu4vr4xnSDxMaL",
+            "MF3mGyEYCl7XYWbV9V6O"
+        ];
+
+        try {
+            const response = await this.getVoicePairFromApi(name);
+            console.log ('getVoiceId response', response);
+            if (!response.ok) {
+                // If a voice pair does not exist on the server, create a new one.
+                const voiceIds = isMale ? maleVoiceIds : femaleVoiceIds;  // Assuming you have these arrays defined somewhere accessible.
+                voiceId = voiceIds[Math.floor(Math.random() * voiceIds.length)];
+
+                // Store the new voice pair on the server.
+                await this.storeVoicePairToApi(name, voiceId);
+            } else {
+                voiceId = (await response.json()).voiceId;
+            }
+        } catch (error) {
+            console.error('Error while getting voice ID:', error);
+        }
+
+        return voiceId;
+    }
+
+    protected async getVoicePairFromApi(name: string): Promise<Response> {
+        return fetch(`https://api.j3.gg/voice/${name}`);
+    }
+
+    protected async storeVoicePairToApi(name: string, voiceId: string): Promise<Response> {
+        console.log ('storeVoicePairToApi', name, voiceId);
+        return fetch(`https://api.j3.gg/voice/${name}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ voiceId })
+        });
+    }
+
+}
 
 export class AwsTextToSpeech extends TextToSpeech<string> {
     private polly: AWS.Polly;
@@ -237,12 +294,12 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
         try {
             const formData = new FormData();
             formData.append('file', audio, `${hash}.mp3`);
-        
+
             const response = await fetch(`https://api.j3.gg/audio/${name}/${hash}`, {
                 method: 'POST',
                 body: formData,
             });
-        
+
             if (!response.ok) {
                 throw new Error(`Failed to post audio. HTTP error! status: ${response.status}`);
             }
@@ -251,36 +308,48 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
         }
     }
 
-    protected async processSpeech(text: string, voiceId: string, name:string): Promise<void> {
+    protected async processSpeech(text: string, genderVoice: string, name: string): Promise<void> {
+        let voiceId;
+        if (name === 'PLAYER-FEMALE') {
+            voiceId = 'MF3mGyEYCl7XYWbV9V6O'
+        } else if (name === 'PLAYER-MALE') {
+            voiceId = 'VR6AewLTigWG4xSOukaG'
+        } else {
+            const isFemale = await this.isFemale(name);
+            voiceId = await this.getVoiceId(name, !isFemale);
+            console.log('Voice ID:', voiceId)
+        }
+
         const hash = Md5.hashStr(voiceId + text);
-        console.log('Processing speech:', text, 'with hash:', hash)
-    
+
         try {
             let response = await fetch(`https://api.j3.gg/audio/${name}/${hash}`);
             console.log('Response:', response)
             let audioContent;
-    
+
             if (!response.ok) {
                 console.log('Audio not found in cache, generating new audio')
+                // console.log('not making new audio cuz testing')
+                // return
                 // If the audio isn't found in cache, generate new audio
                 response = await this.textToSpeech(text, voiceId);
-    
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-    
+
                 audioContent = await response.blob();
-                
+
                 // Cache the new audio for future use
                 this.postAudio(hash, audioContent, name);
             } else {
                 console.log('Audio found in cache')
                 audioContent = await response.blob();
             }
-    
+
             const audioSrc = URL.createObjectURL(audioContent);
             this.audioQueue.push(audioSrc);
-    
+
             if (!this.isPlaying) {
                 await this.playNext();
             }
@@ -288,7 +357,7 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
             console.error('Error while processing speech:', error);
         }
     }
-    
+
 
     private async textToSpeech(text: string, voiceId: string): Promise<Response> {
         const requestUrl = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?optimize_streaming_latency=2`;
@@ -314,7 +383,7 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
             body
         });
 
-        
+
         let remainingCharacters = await getXiCharactersRemaining();
         document.getElementById("currentEngine").innerText = "Elevenlabs";
         document.getElementById("currentEngine").append(" (" + remainingCharacters + ")");

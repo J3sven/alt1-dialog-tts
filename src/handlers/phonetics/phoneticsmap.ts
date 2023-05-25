@@ -33,5 +33,6 @@ export const phoneticsMap: { [word: string]: string; } = {
     "Zarosians": "Zar-oh-see-ans",
     "Mahjarrat": "Mah-jar-at",
     "Icthlarin": "Ik-thlar-in",
+    "ales" : "ails",
   };
   
