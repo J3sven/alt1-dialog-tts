@@ -25,6 +25,7 @@ export async function populateFormFromLocalStorage() {
     if (storedTtsEngine !== null) {
         currentEngineElement.innerText = capitalizeName(storedTtsEngine);
         if(storedTtsEngine === "elevenlabs") {
+            currentEngineElement.innerText = "elevenlabs.io";
             const remainingCharacters = await getXiCharactersRemaining();
             currentEngineElement.append(` (${remainingCharacters})`);
         } else if (storedTtsEngine === "aws") {

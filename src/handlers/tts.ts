@@ -7,6 +7,7 @@ import { gsap } from 'gsap';
 import { Md5 } from 'ts-md5';
 
 const femaleNpcs = './data/femaleNpcs.json'
+const sourceElement = document.querySelector('.responseSource') as HTMLElement;
 var genderCache: { FemaleNpcs: string[] } | null = null;
 
 export abstract class TextToSpeech<T> {
@@ -269,6 +270,7 @@ export class MeSpeakTextToSpeech extends TextToSpeech<{ text: string; voice: str
 
 export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
     private xiApiKey: string;
+    private receivedFrom: string;
 
     constructor(xiApiKey: string, femaleVoiceId: string, maleVoiceId: string) {
         super();
@@ -327,13 +329,18 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
             let response = await fetch(`https://api.j3.gg/audio/${name}/${hash}`);
             console.log('Response:', response)
             let audioContent;
+            this.receivedFrom = 'Cache';
+            sourceElement.style.color = "#29b729";
 
             if (!response.ok) {
                 console.log('Audio not found in cache, generating new audio')
-                // console.log('not making new audio cuz testing')
+                // uncomment when debugging
                 // return
                 // If the audio isn't found in cache, generate new audio
                 response = await this.textToSpeech(text, voiceId);
+                
+                this.receivedFrom = 'Generated new audio';
+                sourceElement.style.color = "yellow";
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -407,6 +414,8 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
 
         const audio = new Audio(audioSrc);
         audio.volume = this.audioVolume;
+        sourceElement.innerText = this.receivedFrom;
+        sourceElement.style.display = "inline-block";
         audio.addEventListener('loadedmetadata', () => {
             this.updateProgress(0);
         });
@@ -415,6 +424,7 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
         });
         audio.addEventListener('ended', () => {
             this.playNext();
+            sourceElement.style.display = "none";
         });
         await audio.play();
     }
