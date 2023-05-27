@@ -1,4 +1,4 @@
-import { phoneticsMap } from "./phonetics/phoneticsmap";
+import { phoneticsMap } from "./modifiermaps/phoneticsmap";
 
 export function stringExistsInJson(searchString: string, jsonData: { FemaleNpcs: string[] }): boolean {
     for (const str of jsonData.FemaleNpcs) {

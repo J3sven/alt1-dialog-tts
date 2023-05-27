@@ -5,6 +5,9 @@ import * as meSpeak from './meSpeak';
 import { getXiCharactersRemaining } from "./xilabs";
 import { gsap } from 'gsap';
 import { Md5 } from 'ts-md5';
+import { applyEffects } from './modifiers';
+import { isGhost, isGnome } from './modifiermaps/specialentities';
+
 
 const femaleNpcs = './data/femaleNpcs.json'
 const sourceElement = document.querySelector('.responseSource') as HTMLElement;
@@ -292,7 +295,6 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
     }
 
     protected async postAudio(hash: string, audio: Blob, name: string): Promise<void> {
-        console.log('Posting audio to Eleven Labs API')
         try {
             const formData = new FormData();
             formData.append('file', audio, `${hash}.mp3`);
@@ -311,7 +313,7 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
     }
 
     protected async processSpeech(text: string, genderVoice: string, name: string): Promise<void> {
-        let voiceId;
+        let voiceId: string;
         if (name === 'PLAYER-FEMALE') {
             voiceId = 'MF3mGyEYCl7XYWbV9V6O'
         } else if (name === 'PLAYER-MALE') {
@@ -347,6 +349,9 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
                 }
 
                 audioContent = await response.blob();
+                console.log('Audio content:', audioContent)
+                if(isGhost(name)) audioContent = await applyEffects(audioContent, false, true);
+                // if(isGnome(name)) audioContent = await applyEffects(audioContent, 2, false);
 
                 // Cache the new audio for future use
                 this.postAudio(hash, audioContent, name);
