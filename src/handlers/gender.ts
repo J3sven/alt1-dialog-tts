@@ -8,3 +8,16 @@ export async function loadGenderData(url: string, jsonDataCache): Promise<{ Fema
 	jsonDataCache = jsonData;
 	return jsonData;
 }
+
+export function determineVoiceId(name:string, isFemale:Boolean, voice:string){
+	let voiceId: string;
+	if (name === 'PLAYER-FEMALE') {
+		voiceId = 'MF3mGyEYCl7XYWbV9V6O'
+	} else if (name === 'PLAYER-MALE') {
+		voiceId = 'VR6AewLTigWG4xSOukaG'
+	} else {
+		voiceId = voice
+		console.log('Voice ID:', voiceId)
+	}
+	return voiceId
+}

@@ -1,10 +1,9 @@
 import * as AWS from 'aws-sdk';
 import { processString, stringExistsInJson, processNameString, fixPhonetics } from './stringfunctions';
-import { loadGenderData } from './gender';
+import { loadGenderData, determineVoiceId } from './gender';
 import * as meSpeak from './meSpeak';
-import { getXiCharactersRemaining } from "./xilabs";
+import { getXiCharactersRemaining,  getVoiceId , generateXiLabsAudio, getAudioFromCacheApi} from "./xilabs";
 import { gsap } from 'gsap';
-import { Md5 } from 'ts-md5';
 import { applyEffects } from './modifiers';
 import { isGhost, isGnome } from './modifiermaps/specialentities';
 
@@ -313,20 +312,16 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
     }
 
     protected async processSpeech(text: string, genderVoice: string, name: string): Promise<void> {
-        let voiceId: string;
-        if (name === 'PLAYER-FEMALE') {
-            voiceId = 'MF3mGyEYCl7XYWbV9V6O'
-        } else if (name === 'PLAYER-MALE') {
-            voiceId = 'VR6AewLTigWG4xSOukaG'
-        } else {
-            const isFemale = await this.isFemale(name);
-            voiceId = await this.getVoiceId(name, !isFemale);
-            console.log('Voice ID:', voiceId)
-        }
-
-        const hash = Md5.hashStr(voiceId + text);
+        const isFemale = await this.isFemale(name);
+        const voice = await this.getVoiceId(name, !isFemale);
+        const voiceId: string = determineVoiceId(name, isFemale, voice);
         console.log(text)
 
+        try {
+            let response =  await getAudioFromCacheApi(name, voiceId, text)
+            let audioContent;
+            this.receivedFrom = 'Cache';
+            sourceElement.style.color = "#29b729";
         try {
             let response = await fetch(`https://api.j3.gg/audio/${name}/${hash}`);
             console.log('Response:', response)
@@ -339,7 +334,7 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
                 // uncomment when debugging
                 // return
                 // If the audio isn't found in cache, generate new audio
-                response = await this.textToSpeech(text, voiceId);
+                response = await generateXiLabsAudio(this.xiApiKey, text, voiceId);
                 
                 this.receivedFrom = 'Generated new audio';
                 sourceElement.style.color = "yellow";
@@ -372,36 +367,8 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
     }
 
 
-    private async textToSpeech(text: string, voiceId: string): Promise<Response> {
-        const requestUrl = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?optimize_streaming_latency=2`;
-
-        const headers = {
-            'Accept': 'audio/mpeg',
-            'xi-api-key': this.xiApiKey,
-            'Content-Type': 'application/json'
-        };
-
-        const body = JSON.stringify({
-            text,
-            model_id: "eleven_monolingual_v1",
-            voice_settings: {
-                stability: 0,
-                similarity_boost: 0
-            }
-        });
-
-        const response = await fetch(requestUrl, {
-            method: 'POST',
-            headers,
-            body
-        });
-
-
-        let remainingCharacters = await getXiCharactersRemaining();
-        document.getElementById("currentEngine").innerText = "Elevenlabs";
-        document.getElementById("currentEngine").append(" (" + remainingCharacters + ")");
-
-        return response;
+    private async textToSpeech(text: string, voiceId: string) {
+        // nothing here
     }
 
     private async playNext(): Promise<void> {
