@@ -351,7 +351,7 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
                 audioContent = await response.blob();
                 console.log('Audio content:', audioContent)
                 if(isGhost(name)) audioContent = await applyEffects(audioContent, false, true);
-                // if(isGnome(name)) audioContent = await applyEffects(audioContent, 2, false);
+                if(isGnome(name)) audioContent = await applyEffects(audioContent, 2, false);
 
                 // Cache the new audio for future use
                 this.postAudio(hash, audioContent, name);

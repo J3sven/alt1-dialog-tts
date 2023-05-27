@@ -83,6 +83,7 @@ export function isGhost(name: string): boolean {
     "LONGRAMBLE",
     "PROFESSOR ONGLEWIP",
     "GOLRIE",
+    "GOLRANA",
     "CAPTAIN BLEEMADGE",
     "REMSAI",
     "FRIZZY SKERNIP",

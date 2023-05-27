@@ -9,9 +9,8 @@
 		"@types/aws-sdk": "^2.7.0",
 		"aws-sdk": "^2.1378.0",
 		"gsap": "^3.11.5",
-		"soundtouchjs": "^0.1.30",
+		"rubberband-web": "^0.2.1",
 		"speak-tts": "^2.0.8",
-		"tone": "^14.7.77",
 		"ts-md5": "^1.3.1"
 	},
 	"devDependencies": {

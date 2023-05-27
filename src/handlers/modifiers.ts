@@ -1,3 +1,4 @@
+import { createRubberBandNode } from 'rubberband-web';
 // Create an AudioContext
 const context = new AudioContext();
 
@@ -94,7 +95,16 @@ export async function applyEffects(audioBlob: Blob, pitchRatio: number | false =
 
         // Apply pitch shift if requested
         if (pitchRatio !== false) {
-            // Add pitch shifting logic here
+            const rubberBandNode = await createRubberBandNode(offlineContext, './handlers/rubberband-processor.js');
+
+            // Connect nodes
+            source.connect(rubberBandNode);
+            rubberBandNode.connect(offlineContext.destination);
+
+            // Set pitch
+            rubberBandNode.setPitch(pitchRatio);
+        } else {
+            source.connect(offlineContext.destination);
         }
 
         // Apply reverb if requested

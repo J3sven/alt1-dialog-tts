@@ -1,6 +1,7 @@
 {
 	"compilerOptions": {
-		"moduleResolution": "Node"
+		"moduleResolution": "Node",
+        "downlevelIteration": true
 	},
 	"allowTsInNodeModules": true
 }
