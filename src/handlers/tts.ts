@@ -351,7 +351,7 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
                 audioContent = await response.blob();
                 console.log('Audio content:', audioContent)
                 if(isGhost(name)) audioContent = await applyEffects(audioContent, false, true);
-                if(isGnome(name)) audioContent = await shiftPitch(audioContent, 1.2);
+                if(isGnome(name)) audioContent = await shiftPitch(audioContent, 1.1);
                 if(isDemon(name)) audioContent = await shiftPitch(audioContent, 0.65);
 
                 // Cache the new audio for future use
