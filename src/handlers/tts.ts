@@ -5,7 +5,7 @@ import * as meSpeak from './meSpeak';
 import { getXiCharactersRemaining } from "./xilabs";
 import { gsap } from 'gsap';
 import { Md5 } from 'ts-md5';
-import { applyEffects, shiftPitch } from './modifiers';
+import { applyReverb, shiftPitch } from './modifiers';
 import { isGhost, isGnome, isDemon } from './modifiermaps/specialentities';
 
 
@@ -350,7 +350,7 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
 
                 audioContent = await response.blob();
                 console.log('Audio content:', audioContent)
-                if(isGhost(name)) audioContent = await applyEffects(audioContent, false, true);
+                if(isGhost(name)) audioContent = await applyReverb(audioContent);
                 if(isGnome(name)) audioContent = await shiftPitch(audioContent, 1.1);
                 if(isDemon(name)) audioContent = await shiftPitch(audioContent, 0.65);
 

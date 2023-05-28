@@ -74,8 +74,7 @@ function audioBufferToWav(buffer: AudioBuffer): Blob {
 }
 
 // Function to apply reverb and pitch shift effects
-export async function applyEffects(audioBlob: Blob, pitchRatio: number | false = false, applyReverb: boolean = false): Promise<Blob> {
-    console.log("applyEffects");
+export async function applyReverb(audioBlob: Blob): Promise<Blob> {
     try {
         // Load audio and impulse response
         const audioBuffer = await loadAudioBuffer(audioBlob);
@@ -93,28 +92,19 @@ export async function applyEffects(audioBlob: Blob, pitchRatio: number | false =
         const source = offlineContext.createBufferSource();
         source.buffer = audioBuffer;
 
-        // Apply pitch shift if requested
-        if (pitchRatio !== false) {
-            const rubberBandNode = await createRubberBandNode(offlineContext, './handlers/rubberband-processor.js');
-
-            // Connect nodes
-            source.connect(rubberBandNode);
-            rubberBandNode.connect(offlineContext.destination);
-
-            // Set pitch
-            rubberBandNode.setPitch(pitchRatio);
-        } else {
-            source.connect(offlineContext.destination);
-        }
+        // Create a GainNode to adjust the volume before applying reverb
+        const gainNode = offlineContext.createGain();
+        gainNode.gain.value = 1.2; // Adjust this value to get the desired volume
+        source.connect(gainNode);
 
         // Apply reverb if requested
-        if (applyReverb && impulseBuffer) {
+        if (impulseBuffer) {
             const convolver = offlineContext.createConvolver();
             convolver.buffer = impulseBuffer;
-            source.connect(convolver);
+            gainNode.connect(convolver);
             convolver.connect(offlineContext.destination);
         } else {
-            source.connect(offlineContext.destination);
+            gainNode.connect(offlineContext.destination);
         }
 
         // Start processing
@@ -131,6 +121,8 @@ export async function applyEffects(audioBlob: Blob, pitchRatio: number | false =
         throw new Error(`Error applying effects: ${err}`);
     }
 }
+
+
 
 export async function shiftPitch(audioBlob: Blob, pitchRatio: number): Promise<Blob> {
     
