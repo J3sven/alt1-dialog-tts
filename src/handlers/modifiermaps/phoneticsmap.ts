@@ -11,7 +11,7 @@ export const phoneticsMap: { [word: string]: string; } = {
     "kree'arra": "kree-uh-rah",
     "k'ril tsutsaroth": "krill tsoo-tsa-roth",
     "tirannwn": "tir-an-un",
-    "geilinor": "Gill-in-or",
+    "gielinor": "Gill-in-or",
     "Morytania": "Mor-ee-tay-nee-ah",
     "Asgarnia": "As-gar-nee-ah",
     "Kandarin": "Can-dar-in",
