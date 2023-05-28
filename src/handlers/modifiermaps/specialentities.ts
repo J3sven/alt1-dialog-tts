@@ -40,7 +40,8 @@ const demons: Set<string> = new Set([
   "AZACORAX",
   "ACHTRYN",
   "SERGEANT DAMIEN",
-  "OCELLUS VIRIUS"
+  "OCELLUS VIRIUS",
+  "XIL'GAR TROG"
 ]);
 
 
