@@ -5,8 +5,8 @@ import * as meSpeak from './meSpeak';
 import { getXiCharactersRemaining } from "./xilabs";
 import { gsap } from 'gsap';
 import { Md5 } from 'ts-md5';
-import { applyEffects } from './modifiers';
-import { isGhost, isGnome } from './modifiermaps/specialentities';
+import { applyEffects, shiftPitch } from './modifiers';
+import { isGhost, isGnome, isDemon } from './modifiermaps/specialentities';
 
 
 const femaleNpcs = './data/femaleNpcs.json'
@@ -351,7 +351,8 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
                 audioContent = await response.blob();
                 console.log('Audio content:', audioContent)
                 if(isGhost(name)) audioContent = await applyEffects(audioContent, false, true);
-                if(isGnome(name)) audioContent = await applyEffects(audioContent, 2, false);
+                if(isGnome(name)) audioContent = await shiftPitch(audioContent, 1.2);
+                if(isDemon(name)) audioContent = await shiftPitch(audioContent, 0.65);
 
                 // Cache the new audio for future use
                 this.postAudio(hash, audioContent, name);
@@ -395,7 +396,6 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
             headers,
             body
         });
-
 
         let remainingCharacters = await getXiCharactersRemaining();
         document.getElementById("currentEngine").innerText = "Elevenlabs";

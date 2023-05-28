@@ -131,3 +131,18 @@ export async function applyEffects(audioBlob: Blob, pitchRatio: number | false =
         throw new Error(`Error applying effects: ${err}`);
     }
 }
+
+export async function shiftPitch(audioBlob: Blob, pitchRatio: number): Promise<Blob> {
+    
+    const formData = new FormData();
+    formData.append('audio', audioBlob);
+
+    const pitchShift = pitchRatio; // change this to desired pitch shift
+
+    const postprocessResponse = await fetch(`https://api.j3.gg/postprocess/${pitchShift}`, {
+        method: 'POST',
+        body: formData
+    });
+
+    return await postprocessResponse.blob();
+}
