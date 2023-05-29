@@ -51,7 +51,7 @@ const handleSelectChange = (addCtaClass = true) => {
     if (selectedOption === "aws" || selectedOption === "elevenlabs") {
         handleElementsVisibility(document.getElementsByClassName(selectedOption) as HTMLCollectionOf<HTMLElement>, "");
     }
-    
+
     if (addCtaClass) handleInputChange();
 };
 
@@ -76,12 +76,17 @@ settingsToggle.addEventListener("click", () => {
     settingsToggle.classList.toggle("active");
 });
 
+// document.addEventListener('contextmenu', (event) => {
+//     event.preventDefault();
+// });
+
+
 if (window.alt1) {
     alt1.identifyAppUrl("./appconfig.json");
-} else{
-	const output = document.getElementById("status");
-	output.insertAdjacentHTML("beforeend", `<div>You need to run this page in alt1 to capture the screen</div>`);
-	if (!alt1.permissionPixel) output.insertAdjacentHTML("beforeend", `<div>Page is not installed as app or capture permission is not enabled</div>`);
+} else {
+    const output = document.getElementById("status");
+    output.insertAdjacentHTML("beforeend", `<div>You need to run this page in alt1 to capture the screen</div>`);
+    if (!alt1.permissionPixel) output.insertAdjacentHTML("beforeend", `<div>Page is not installed as app or capture permission is not enabled</div>`);
 }
 
 window.onload = loadCache;

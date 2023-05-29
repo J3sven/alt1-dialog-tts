@@ -30,10 +30,9 @@ export async function openDB() {
     });
 }
 
-let existingKeysSet;  // This will hold our existing keys
+let existingKeysSet = new Set();  // This will hold our existing keys
 
 export async function loadExistingKeys() {
-    existingKeysSet = new Set();
     return new Promise<void>((resolve, reject) => {
         const transaction = db.transaction([DB_STORE_NAME], 'readonly');
         const objectStore = transaction.objectStore(DB_STORE_NAME);
