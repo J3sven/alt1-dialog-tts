@@ -1,6 +1,7 @@
 import { getPlayerFromLocalStorage } from "./handlers/self";
 import { populateFormFromLocalStorage } from "./handlers/playerform";
 import { capture } from "./handlers/capture";
+import { loadCache } from './handlers/localcache';
 
 // require("!file-loader?name=[name].[ext]!./index.html");
 // require("!file-loader?name=[name].[ext]!./app.css");
@@ -82,3 +83,5 @@ if (window.alt1) {
 	output.insertAdjacentHTML("beforeend", `<div>You need to run this page in alt1 to capture the screen</div>`);
 	if (!alt1.permissionPixel) output.insertAdjacentHTML("beforeend", `<div>Page is not installed as app or capture permission is not enabled</div>`);
 }
+
+window.onload = loadCache;

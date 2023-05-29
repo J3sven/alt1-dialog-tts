@@ -288,3 +288,14 @@ html::-webkit-scrollbar {
 .aws-ttsengine label {
 	width: unset;
 }
+
+.loading-screen{
+	position: absolute;
+	z-index: 999;
+	background-color: #1c2c34;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	text-align: center;
+}

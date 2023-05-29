@@ -110,16 +110,31 @@
 	<main>
 		<div id="status"></div>
 	</main>
-	<span class="responseSource" style="display:none; color: yellow; text-align:center; position: absolute; top:55px; width: 100%;">cache</span>
+	<span class="responseSource"
+		style="display:none; color: yellow; text-align:center; position: absolute; top:55px; width: 100%;">cache</span>
 	<div id="progress-bar"
 		style="position: absolute; bottom: 5px; width: 82%; left: 9%; background-color: #3b4a56; height: 5px; border-radius: 15px;">
-		<div id="progress" style="height: 100%; background-color: #d9a81e; width: 0%; transition: width 0.1s; border-radius: 15px;"></div>
+		<div id="progress"
+			style="height: 100%; background-color: #d9a81e; width: 0%; transition: width 0.1s; border-radius: 15px;">
+		</div>
 	</div>
 	<div class="settings-saved">Settings saved!</div>
+	<div class="loading-screen hidden">
+		<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+			style="margin: auto; background: rgba(241, 242, 243, 0); display: block;" width="144px" height="144px"
+			viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+			<circle cx="50" cy="50" fill="none" stroke="#d9a81e" stroke-width="3" r="13"
+				stroke-dasharray="61.26105674500097 22.420352248333657">
+				<animateTransform attributeName="transform" type="rotate" repeatCount="indefinite"
+					dur="2.127659574468085s" values="0 50 50;360 50 50" keyTimes="0;1"></animateTransform>
+			</circle>
+		</svg>
+		<span><strong>(re)Initiating local cache</strong><br>This may take a minute.</span>
+	</div>
 	<script src="https://sdk.amazonaws.com/js/aws-sdk-2.1378.0.min.js"></script>
 	<script>
 		var global = global || window;
-		var Buffer = Buffer || [];
+		var awsBuffer = awsBuffer || [];
 		var process = process || {
 			env: { DEBUG: undefined },
 			version: []

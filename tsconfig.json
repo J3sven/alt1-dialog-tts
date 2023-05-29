@@ -1,7 +1,8 @@
 {
 	"compilerOptions": {
 		"moduleResolution": "Node",
-        "downlevelIteration": true
+        "downlevelIteration": true,
+        "esModuleInterop": true
 	},
 	"allowTsInNodeModules": true
 }

@@ -7,6 +7,7 @@ import { gsap } from 'gsap';
 import { Md5 } from 'ts-md5';
 import { applyReverb, shiftPitch } from './modifiers';
 import { isGhost, isGnome, isDemon } from './modifiermaps/specialentities';
+import { getFromDB, addToDB, addToVoicePairsDB, getFromVoicePairsDB } from './localcache';
 
 
 const femaleNpcs = './data/femaleNpcs.json'
@@ -65,11 +66,9 @@ export abstract class TextToSpeech<T> {
         this.lastProcessedString = text;
 
         let genderVoice = this.maleVoice;
-        if(this.isFemale(name)){
+        if (this.isFemale(name)) {
             genderVoice = this.femaleVoice;
         }
-
-        // console.log('name', name, 'player', player.self, 'player.selfFemale', player.selfFemale)
 
         if (name === player.self) {
             if (player.selfFemale) {
@@ -78,7 +77,7 @@ export abstract class TextToSpeech<T> {
             } else {
                 name = 'player-male';
             }
-        }        
+        }
 
         await this.processSpeech(fixPhonetics(text), genderVoice, name.toUpperCase());
     }
@@ -89,9 +88,8 @@ export abstract class TextToSpeech<T> {
 
 
     protected async getVoiceId(name: string, isMale: boolean): Promise<string> {
-        console.log ('getVoiceId', name, isMale);
         let voiceId = '';
-
+    
         const maleVoiceIds = [
             "ErXwobaYiN019PkySvjV",
             "TxGEqnHWrfWFTfGW9XjX",
@@ -99,31 +97,40 @@ export abstract class TextToSpeech<T> {
             "pNInz6obpgDQGcFmaJgB",
             "yoZ06aMxZJJ28mfd3POQ"
         ];
-
+    
         const femaleVoiceIds = [
             "21m00Tcm4TlvDq8ikWAM",
             "AZnzlk1XvdvUeBnXmlld",
             "EXAVITQu4vr4xnSDxMaL",
             "MF3mGyEYCl7XYWbV9V6O"
         ];
-
+    
         try {
-            const response = await this.getVoicePairFromApi(name);
-            console.log ('getVoiceId response', response);
-            if (!response.ok) {
-                // If a voice pair does not exist on the server, create a new one.
-                const voiceIds = isMale ? maleVoiceIds : femaleVoiceIds;  // Assuming you have these arrays defined somewhere accessible.
-                voiceId = voiceIds[Math.floor(Math.random() * voiceIds.length)];
-
-                // Store the new voice pair on the server.
-                await this.storeVoicePairToApi(name, voiceId);
+            const cacheResponse = await getFromVoicePairsDB(name);
+    
+            if (cacheResponse) {
+                voiceId = cacheResponse.voiceId;
             } else {
-                voiceId = (await response.json()).voiceId;
+                const apiResponse = await this.getVoicePairFromApi(name);
+    
+                if (!apiResponse.ok) {
+                    // If a voice pair does not exist on the server, create a new one.
+                    const voiceIds = isMale ? maleVoiceIds : femaleVoiceIds;  // Assuming you have these arrays defined somewhere accessible.
+                    voiceId = voiceIds[Math.floor(Math.random() * voiceIds.length)];
+    
+                    // Store the new voice pair on the server.
+                    await this.storeVoicePairToApi(name, voiceId);
+                } else {
+                    voiceId = (await apiResponse.json()).voiceId;
+                }
+    
+                // Update the cache with the new voiceId
+                await addToVoicePairsDB(name, voiceId);
             }
         } catch (error) {
             console.error('Error while getting voice ID:', error);
         }
-
+    
         return voiceId;
     }
 
@@ -132,7 +139,6 @@ export abstract class TextToSpeech<T> {
     }
 
     protected async storeVoicePairToApi(name: string, voiceId: string): Promise<Response> {
-        console.log ('storeVoicePairToApi', name, voiceId);
         return fetch(`https://api.j3.gg/voice/${name}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -321,44 +327,48 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
         } else {
             const isFemale = await this.isFemale(name);
             voiceId = await this.getVoiceId(name, !isFemale);
-            console.log('Voice ID:', voiceId)
         }
 
         const hash = Md5.hashStr(voiceId + text);
-        console.log(text)
 
         try {
-            let response = await fetch(`https://api.j3.gg/audio/${name}/${hash}`);
-            console.log('Response:', response)
             let audioContent;
-            this.receivedFrom = 'Cache';
-            sourceElement.style.color = "#29b729";
-
-            if (!response.ok) {
-                console.log('Audio not found in cache, generating new audio')
-                // uncomment when debugging
-                // return
-                // If the audio isn't found in cache, generate new audio
-                response = await this.textToSpeech(text, voiceId);
-                
-                this.receivedFrom = 'Generated new audio';
-                sourceElement.style.color = "yellow";
+            let audioData = await getFromDB(name, hash) as { data: Blob } | undefined;
+            audioContent = audioData?.data ;
+            this.receivedFrom = 'Local cache';
+            sourceElement.style.color = "#24dd24";
+            
+            if (!audioContent) {
+                this.receivedFrom = 'Remote cache';
+                sourceElement.style.color = "#00dcff";
+                let response = await fetch(`https://api.j3.gg/audio/${name}/${hash}`);
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    console.log('Audio not found in cache, generating new audio')
+                    // uncomment when debugging
+                    // return
+                    // If the audio isn't found in cache, generate new audio
+                    response = await this.textToSpeech(text, voiceId);
+
+                    this.receivedFrom = 'Generated new audio';
+                    sourceElement.style.color = "yellow";
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    audioContent = await response.blob();
+                    if (isGhost(name)) audioContent = await applyReverb(audioContent);
+                    if (isGnome(name)) audioContent = await shiftPitch(audioContent, 1.1);
+                    if (isDemon(name)) audioContent = await shiftPitch(audioContent, 0.65);
+
+                    // Cache the new audio for future use
+                    await addToDB(name, hash, audioContent);
+                    this.postAudio(hash, audioContent, name);
+                } else {
+                    audioContent = await response.blob();
+                    await addToDB(name, hash, audioContent);
                 }
-
-                audioContent = await response.blob();
-                console.log('Audio content:', audioContent)
-                if(isGhost(name)) audioContent = await applyReverb(audioContent);
-                if(isGnome(name)) audioContent = await shiftPitch(audioContent, 1.1);
-                if(isDemon(name)) audioContent = await shiftPitch(audioContent, 0.65);
-
-                // Cache the new audio for future use
-                this.postAudio(hash, audioContent, name);
-            } else {
-                console.log('Audio found in cache')
-                audioContent = await response.blob();
             }
 
             const audioSrc = URL.createObjectURL(audioContent);
