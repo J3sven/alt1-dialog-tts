@@ -9,13 +9,21 @@ export function stringExistsInJson(searchString: string, jsonData: { FemaleNpcs:
     return false;
 }
 
-export function processString(inputString) {
+export function processString(inputString: string): string {
     const commaRegex = /,([^ ])/g;
     const oneApostropheRegex = /1'/g;
     const oneMRegex = /1m/g;
-    const commaFixedString = inputString.replace(commaRegex, ' $1'); // Changed from ', $1' to ' $1'
+    const oneVeRegex = /1ve/g;
+    const oneDRegex = /1d/g;
+    const oneLLRegex = /1ll/g;
+    
+    const commaFixedString = inputString.replace(commaRegex, ' $1');
     const apostropheFixedString = commaFixedString.replace(oneApostropheRegex, "I'");
-    const result = apostropheFixedString.replace(oneMRegex, "I'm");
+    const mFixedString = apostropheFixedString.replace(oneMRegex, "I'm");
+    const veFixedString = mFixedString.replace(oneVeRegex, "I've");
+    const dFixedString = veFixedString.replace(oneDRegex, "I'd");
+    const result = dFixedString.replace(oneLLRegex, "I'll");
+    
     return result;
 }
 
