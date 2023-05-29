@@ -5,7 +5,6 @@ let db;
 const DB_NAME = 'audioDB';
 const DB_STORE_NAME = 'audio';
 
-let voicedb;
 const VOICE_DB_NAME = 'voicePairsDB';
 const VOICE_DB_STORE_NAME = 'voicePairsStore';
 
@@ -31,9 +30,41 @@ export async function openDB() {
     });
 }
 
+let existingKeysSet;  // This will hold our existing keys
+
+export async function loadExistingKeys() {
+    existingKeysSet = new Set();
+    return new Promise<void>((resolve, reject) => {
+        const transaction = db.transaction([DB_STORE_NAME], 'readonly');
+        const objectStore = transaction.objectStore(DB_STORE_NAME);
+        const request = objectStore.openCursor();
+
+        request.onsuccess = function(event) {
+            const cursor = event.target.result;
+            if (cursor) {
+                existingKeysSet.add(cursor.key);
+                cursor.continue();
+            } else {
+                resolve();
+            }
+        };
+
+        request.onerror = function(event) {
+            console.error('Error loading existing keys:', request.error);
+            reject(request.error);
+        };
+    });
+}
 
 // Function to add a blob to IndexedDB
 export async function addToDB(name: string, hash: string, data: Blob) {
+    const key = `${name}/${hash}`;
+
+    // If the key already exists, don't add it again
+    if (existingKeysSet.has(key)) {
+        return;
+    }
+
     return new Promise<void>((resolve, reject) => {
         const transaction = db.transaction([DB_STORE_NAME], 'readwrite');
         transaction.onerror = event => {
@@ -45,10 +76,10 @@ export async function addToDB(name: string, hash: string, data: Blob) {
         };
         const objectStore = transaction.objectStore(DB_STORE_NAME);
         const record = {
-            id: `${name}/${hash}`,
+            id: key,
             data: data
         };
-        objectStore.put(record);
+        objectStore.add(record);  // Using add() instead of put()
     });
 }
 
@@ -89,6 +120,8 @@ export async function loadCache() {
 
     // Use JSZip to unzip the file
     const zip = await JSZip.loadAsync(arrayBuffer);
+    
+    await loadExistingKeys();
 
     // Create an array to hold the promises
     const promises = [];
