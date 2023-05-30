@@ -326,6 +326,8 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
             voiceId = 'VR6AewLTigWG4xSOukaG'
         }  else if (name === 'WISE OLD MAN') {
             voiceId = 'TiLw41Jevzwmmak89xWl'
+        } else if (name === 'GRANNY POTTERINGTON') {
+            voiceId = 'sNCcXLo5TnCQrzQ5d8hl'
         } else {
             const isFemale = await this.isFemale(name);
             voiceId = await this.getVoiceId(name, !isFemale);
