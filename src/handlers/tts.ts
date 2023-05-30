@@ -324,13 +324,15 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
             voiceId = 'MF3mGyEYCl7XYWbV9V6O'
         } else if (name === 'PLAYER-MALE') {
             voiceId = 'VR6AewLTigWG4xSOukaG'
+        }  else if (name === 'WISE OLD MAN') {
+            voiceId = 'TiLw41Jevzwmmak89xWl'
         } else {
             const isFemale = await this.isFemale(name);
             voiceId = await this.getVoiceId(name, !isFemale);
         }
 
         const hash = Md5.hashStr(voiceId + text);
-
+        console.log(`Hash: ${hash}`)
         try {
             let audioContent;
             let audioData = await getFromDB(name, hash) as { data: Blob } | undefined;
