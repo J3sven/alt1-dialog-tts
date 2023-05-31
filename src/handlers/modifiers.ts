@@ -12,14 +12,24 @@ interface ImpulseResponse {
     addDuration: number;
 }
 
-const impulseResponse: ImpulseResponse = {
-    title: "Creswell Crags",
-    file: "handlers/sounds/impulse_response_3.wav",
-    size: 1048220,
-    buffer: null,
-    link: "https://openairlib.net/?page_id=441",
-    addDuration: 1
-};
+const impulseResponse: ImpulseResponse[] = [
+    {
+        title: "Creswell Crags",
+        file: "handlers/sounds/impulse_response_3.wav",
+        size: 1048220,
+        buffer: null,
+        link: "https://openairlib.net/?page_id=441",
+        addDuration: 1
+    },
+    {
+        title: "Tvísöngur Sound Sculpture – Iceland",
+        file: "handlers/sounds/impulse_response_10.wav",
+        size: 621026,
+        buffer: null,
+        link: "https://openairlib.net/?page_id=752",
+        addDuration: 3
+    }
+];
 
 // Function to load an audio file into an audio buffer
 async function loadAudioBuffer(audioBlob: Blob): Promise<AudioBuffer> {
@@ -74,13 +84,13 @@ function audioBufferToWav(buffer: AudioBuffer): Blob {
 }
 
 // Function to apply reverb and pitch shift effects
-export async function applyReverb(audioBlob: Blob): Promise<Blob> {
+export async function applyReverb(audioBlob: Blob, impulseIndex: number): Promise<Blob> {
     try {
         // Load audio and impulse response
         const audioBuffer = await loadAudioBuffer(audioBlob);
         let impulseBuffer: AudioBuffer | null = null;
         if (applyReverb) {
-            const response = await fetch(impulseResponse.file);
+            const response = await fetch(impulseResponse[impulseIndex].file);
             const impulseBlob = await response.blob();
             impulseBuffer = await loadAudioBuffer(impulseBlob);
         }

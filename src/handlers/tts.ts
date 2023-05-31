@@ -380,7 +380,7 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
                     }
 
                     audioContent = await response.blob();
-                    if (isGhost(name)) audioContent = await applyReverb(audioContent);
+                    if (isGhost(name)) audioContent = await applyReverb(audioContent, 0);
                     if (isGnome(name)) audioContent = await shiftPitch(audioContent, 1.1);
                     if (isDemon(name)) audioContent = await shiftPitch(audioContent, 0.65);
 
