@@ -85,26 +85,37 @@ export function fixPhonetics(text: string): string {
 }
 
 function generalizeText(input: string): string {
-    const precedingText = "Your new task is to kill ";
-    const timeSpentText = /spent (.*) in the world/;
-    const arrivalText = /arrived (.*) days/;
-  
-    if (input.includes(precedingText)) {
-      const regex = /\d+\s/g;
-      const updatedString = input.replace(regex, "");
-      return updatedString;
+    const slayerText = "Your new task is to kill ";
+    const hansText = /spent (.*) in the world/;
+    const hansText2 = /arrived (.*) days/;
+    const reaperText = /collect (\d+) souls/;
+    const houseText = /(I mean the house that I designed myself, like your house)( in .*?\.)/;
+
+    if (input.includes(slayerText)) {
+        const regex = /\d+\s/g;
+        const updatedString = input.replace(regex, "");
+        return updatedString;
     }
-  
-    if (timeSpentText.test(input)) {
-      input = input.replace(timeSpentText, "spent a lot of time in the world");
+
+    if (hansText.test(input)) {
+        input = input.replace(hansText, "spent a lot of time in the world");
     }
-  
-    if (arrivalText.test(input)) {
-      input = input.replace(arrivalText, "arrived many days");
+
+    if (hansText2.test(input)) {
+        input = input.replace(hansText2, "arrived many days");
     }
-  
+
+    if (reaperText.test(input)) {
+        input = input.replace(reaperText, "collect souls");
+    }
+
+    if (houseText.test(input)) {
+        input = input.replace(houseText, "$1.");
+    }
+
     return input;
-  }
-  
-  
+}
+
+
+
 

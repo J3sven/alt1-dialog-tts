@@ -40,8 +40,20 @@ export abstract class TextToSpeech<T> {
 
     constructor() {
         const volumeSlider = document.getElementById('volume') as HTMLInputElement;
+    
+        // Load the stored value from localStorage or use a default value if there is no stored value
+        const storedVolume = localStorage.getItem('volume');
+        if (storedVolume !== null) {
+            this.audioVolume = parseFloat(storedVolume);
+            volumeSlider.value = storedVolume;  // Set the slider to the stored value
+        } else {
+            this.audioVolume = 0.5; // Default value
+        }
+    
         volumeSlider.addEventListener('input', () => {
             this.audioVolume = parseFloat(volumeSlider.value);
+            // Store the new value in localStorage every time it changes
+            localStorage.setItem('volume', volumeSlider.value);
         });
     }
 
@@ -320,18 +332,24 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
 
     protected async processSpeech(text: string, genderVoice: string, name: string): Promise<void> {
         let voiceId: string;
-        if (name === 'PLAYER-FEMALE') {
-            voiceId = 'MF3mGyEYCl7XYWbV9V6O'
-        } else if (name === 'PLAYER-MALE') {
-            voiceId = 'VR6AewLTigWG4xSOukaG'
-        }  else if (name === 'WISE OLD MAN') {
-            voiceId = 'TiLw41Jevzwmmak89xWl'
-        } else if (name === 'GRANNY POTTERINGTON') {
-            voiceId = 'sNCcXLo5TnCQrzQ5d8hl'
+        const voiceIdLookup = {
+            'PLAYER-FEMALE': 'MF3mGyEYCl7XYWbV9V6O',
+            'PLAYER-MALE': 'VR6AewLTigWG4xSOukaG',
+            'WISE OLD MAN': 'TiLw41Jevzwmmak89xWl',
+            'GRANNY POTTERINGTON': 'sNCcXLo5TnCQrzQ5d8hl',
+            'ZENEVIVIA': 'iKwvJVerfnKx6PrfJK3Y',
+            'ARIS': 'gZ9LBLNjYC02R7gSBR6P',
+            'FORTUNETELLER': 'gZ9LBLNjYC02R7gSBR6P'
+        };
+        
+        if (voiceIdLookup.hasOwnProperty(name)) {
+            voiceId = voiceIdLookup[name];
         } else {
             const isFemale = await this.isFemale(name);
             voiceId = await this.getVoiceId(name, !isFemale);
         }
+        
+        
 
         const hash = Md5.hashStr(voiceId + text);
         console.log(`Hash: ${hash}`)
@@ -412,7 +430,7 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
         });
 
         let remainingCharacters = await getXiCharactersRemaining();
-        document.getElementById("currentEngine").innerText = "Elevenlabs";
+        document.getElementById("currentEngine").innerText = "elevenlabs.io";
         document.getElementById("currentEngine").append(" (" + remainingCharacters + ")");
 
         return response;
