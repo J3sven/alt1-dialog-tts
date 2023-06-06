@@ -332,6 +332,7 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
 
     protected async processSpeech(text: string, genderVoice: string, name: string): Promise<void> {
         let voiceId: string;
+        console.log('text: ' + text);
         const voiceIdLookup = {
             'PLAYER-FEMALE': 'MF3mGyEYCl7XYWbV9V6O',
             'PLAYER-MALE': 'VR6AewLTigWG4xSOukaG',
