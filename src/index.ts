@@ -69,7 +69,7 @@ let captureInterval = window.setInterval(async () => {
         console.error("Error capturing:", error);
         window.clearInterval(captureInterval);
     }
-}, 600);
+}, 400);
 
 settingsToggle.addEventListener("click", () => {
     settings.classList.toggle("hidden");
