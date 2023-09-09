@@ -17,17 +17,19 @@ interface FormElements {
     [key: string]: HTMLInputElement | HTMLSelectElement;
 }
 
-const formIds = ["player", "isFemale", "ttsEngine", "awsRegion", "awsAccessKey", "awsSecretKey", "elevenlabsapikey", "awsttsEngine"];
+const formIds = ["player", "isFemale", "elevenlabsapikey"];
 const elements: FormElements = formIds.reduce((acc: FormElements, id: string) => ({ ...acc, [id]: document.getElementById(id) as HTMLInputElement | HTMLSelectElement }), {});
 
 const settingsForm = document.getElementById("settings-form") as HTMLFormElement;
 const settingsToggle = document.getElementById("settingsToggle") as HTMLElement;
 const settings = document.getElementById("settings") as HTMLElement;
 
+(window as any).cacheServer = "http://localhost:3000";
+
 settingsForm.addEventListener("submit", (event) => {
     event.preventDefault();
     Object.entries(elements).forEach(([key, element]) => {
-        const value = (key === "awsttsEngine") ? (element as HTMLInputElement).checked.toString() : element.value;
+        const value = element.value;
         localStorage.setItem(key, value);
     });
     window.location.reload();
@@ -43,24 +45,10 @@ const handleInputChange = () => {
     (settingsForm.querySelector(".formsubmit") as HTMLButtonElement).classList.add("cta");
 };
 
-const handleSelectChange = (addCtaClass = true) => {
-    const selectedOption = elements.ttsEngine.value;
-    handleElementsVisibility(document.getElementsByClassName("aws") as HTMLCollectionOf<HTMLElement>, "none");
-    handleElementsVisibility(document.getElementsByClassName("elevenlabs") as HTMLCollectionOf<HTMLElement>, "none");
-
-    if (selectedOption === "aws" || selectedOption === "elevenlabs") {
-        handleElementsVisibility(document.getElementsByClassName(selectedOption) as HTMLCollectionOf<HTMLElement>, "");
-    }
-
-    if (addCtaClass) handleInputChange();
-};
-
 Array.from(settingsForm.querySelectorAll("input, select")).forEach((element: HTMLElement) => {
     element.addEventListener("change", handleInputChange);
-    element.addEventListener("change", () => handleSelectChange(true));
 });
 
-handleSelectChange(false);
 
 let captureInterval = window.setInterval(async () => {
     try {

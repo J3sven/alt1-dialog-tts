@@ -18,29 +18,4 @@ export async function populateFormFromLocalStorage() {
             (document.getElementById(key) as HTMLInputElement | HTMLSelectElement).value = value;
         }
     }
-    const storedTtsEngine = localStorage.getItem("ttsEngine");
-    const storedAwsttsEngine = localStorage.getItem("awsttsEngine");
-
-    const currentEngineElement = document.getElementById("currentEngine");
-    if (storedTtsEngine !== null) {
-        currentEngineElement.innerText = capitalizeName(storedTtsEngine);
-        if(storedTtsEngine === "elevenlabs") {
-            currentEngineElement.innerText = "elevenlabs.io";
-            const remainingCharacters = await getXiCharactersRemaining();
-            currentEngineElement.append(` (${remainingCharacters})`);
-        } else if (storedTtsEngine === "aws") {
-            currentEngineElement.innerText = "Amazon Polly";
-            if (storedAwsttsEngine === "true"){
-                currentEngineElement.append(" (Neural)");
-            }
-        }
-    } else {
-        (document.getElementById("ttsEngine") as HTMLSelectElement).value = "mespeak";
-        currentEngineElement.innerText = "mespeak";
-    }
-
-    if (storedAwsttsEngine !== null) {
-        const checkbox = document.getElementById("awsttsEngine") as HTMLInputElement;
-        checkbox.checked = storedAwsttsEngine === "true";
-    }
 }

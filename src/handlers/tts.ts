@@ -1,7 +1,5 @@
-import * as AWS from 'aws-sdk';
-import { processString, stringExistsInJson, processNameString, fixPhonetics } from './stringfunctions';
+import { stringExistsInJson, processNameString, fixPhonetics } from './stringfunctions';
 import { loadGenderData } from './gender';
-import * as meSpeak from './meSpeak';
 import { getXiCharactersRemaining } from "./xilabs";
 import { gsap } from 'gsap';
 import { Md5 } from 'ts-md5';
@@ -147,146 +145,17 @@ export abstract class TextToSpeech<T> {
     }
 
     protected async getVoicePairFromApi(name: string): Promise<Response> {
-        return fetch(`https://api.j3.gg/voice/${name}`);
+        return fetch((window as any).cacheServer + `/voice/${name}`);
     }
 
     protected async storeVoicePairToApi(name: string, voiceId: string): Promise<Response> {
-        return fetch(`https://api.j3.gg/voice/${name}`, {
+        return fetch((window as any).cacheServer + `voice/${name}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ voiceId })
         });
     }
 
-}
-
-export class AwsTextToSpeech extends TextToSpeech<string> {
-    private polly: AWS.Polly;
-    private neural = false;
-
-    constructor(accessKeyId: string, secretAccessKey: string, region: string, neural?: boolean) {
-        super();
-        this.femaleVoice = "Joanna";
-        this.maleVoice = "Matthew";
-
-        AWS.config.region = region;
-        AWS.config.credentials = new AWS.Credentials({
-            accessKeyId: accessKeyId,
-            secretAccessKey: secretAccessKey,
-        });
-
-        this.polly = new AWS.Polly();
-        this.neural = neural || false;
-    }
-
-    protected isInAudioQueue(text: string): boolean {
-        return this.audioQueue.indexOf(text) !== -1;
-    }
-
-    protected async processSpeech(text: string, genderVoice: string): Promise<void> {
-        const params: AWS.Polly.SynthesizeSpeechInput = {
-            Engine: this.neural ? 'neural' : 'standard',
-            Text: processString(text),
-            OutputFormat: 'mp3',
-            VoiceId: genderVoice,
-        };
-
-        try {
-            const data = await this.polly.synthesizeSpeech(params).promise();
-            const audioContent = (data.AudioStream as Buffer).toString('base64');
-            this.enqueueAudio(`data:audio/mp3;base64,${audioContent}`);
-        } catch (error) {
-            console.error('Error while fetching Amazon Polly TTS API:', error);
-        }
-    }
-
-    private enqueueAudio(audioSrc: string): void {
-        this.audioQueue.push(audioSrc);
-        if (!this.isPlaying) {
-            this.playNext();
-        }
-    }
-
-    private async playNext(): Promise<void> {
-
-        if (this.audioQueue.length === 0) {
-            this.isPlaying = false;
-            return;
-        }
-
-        this.isPlaying = true;
-        const audioSrc = this.audioQueue.shift();
-        const audio = new Audio(audioSrc);
-        audio.addEventListener('loadedmetadata', () => {
-            this.updateProgress(0);
-        });
-        audio.addEventListener('timeupdate', () => {
-            this.updateProgress(audio.currentTime / audio.duration);
-        });
-        audio.volume = this.audioVolume;
-        audio.onended = async () => {
-            await this.playNext();
-        };
-        audio.play();
-    }
-}
-
-
-export class MeSpeakTextToSpeech extends TextToSpeech<{ text: string; voice: string }> {
-    constructor() {
-        super();
-        this.femaleVoice = 'en/en+f3';
-        this.maleVoice = 'en/en+m3';
-
-        meSpeak.loadConfig('./mespeak_config.json');
-        meSpeak.loadVoice('./voices/en.json');
-    }
-
-    protected isInAudioQueue(text: string): boolean {
-        return this.audioQueue.some(item => item.text === text);
-    }
-
-    protected async processSpeech(text: string, genderVoice: string): Promise<void> {
-        this.enqueueAudio({ text, voice: genderVoice });
-    }
-
-    private enqueueAudio(item: { text: string; voice: string }): void {
-        this.audioQueue.push(item);
-        if (!this.isPlaying) {
-            this.playNext();
-        }
-    }
-
-    private playNext(): void {
-        if (this.audioQueue.length === 0) {
-            this.isPlaying = false;
-            return;
-        }
-
-        this.isPlaying = true;
-        const { text, voice } = this.audioQueue.shift();
-        const wavData = meSpeak.speak(text, { voice, rawdata: 'array' });
-
-        if (wavData && !(wavData instanceof Boolean)) {
-            const blob = new Blob([new Uint8Array(wavData as ArrayBuffer)], { type: 'audio/wav' });
-            const audioURL = URL.createObjectURL(blob);
-            const audio = new Audio(audioURL);
-            audio.addEventListener('loadedmetadata', () => {
-                this.updateProgress(0);
-            });
-            audio.addEventListener('timeupdate', () => {
-                this.updateProgress(audio.currentTime / audio.duration);
-            });
-            audio.volume = this.audioVolume;
-            audio.onended = () => {
-                this.playNext();
-            };
-            audio.play();
-        } else {
-            console.error('Error synthesizing speech:', text);
-            this.isPlaying = false;
-        }
-    }
 }
 
 export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
@@ -317,7 +186,7 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
             const formData = new FormData();
             formData.append('file', audio, `${hash}.mp3`);
 
-            const response = await fetch(`https://api.j3.gg/audio/${name}/${hash}`, {
+            const response = await fetch((window as any).cacheServer + `/audio/${name}/${hash}`, {
                 method: 'POST',
                 body: formData,
             });
@@ -364,7 +233,7 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
             if (!audioContent) {
                 this.receivedFrom = 'Remote cache';
                 sourceElement.style.color = "#00dcff";
-                let response = await fetch(`https://api.j3.gg/audio/${name}/${hash}`);
+                let response = await fetch((window as any).cacheServer + `/audio/${name}/${hash}`);
 
                 if (!response.ok) {
                     console.log('Audio not found in cache, generating new audio')

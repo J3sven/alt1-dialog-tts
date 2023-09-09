@@ -269,11 +269,6 @@ html::-webkit-scrollbar {
 	font-size: 1em;
 }
 
-#currentEngine::before {
-	content: "TTS Engine: ";
-	font-weight: 400;
-}
-
 .aws-ttsengine {
 	flex-direction: unset;
 	justify-content: left;

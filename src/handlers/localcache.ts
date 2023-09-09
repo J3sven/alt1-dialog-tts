@@ -1,4 +1,3 @@
-import { Md5 } from 'ts-md5';
 import * as JSZip from 'jszip';
 // Setup IndexedDB
 let db;
@@ -114,7 +113,7 @@ export async function loadCache() {
 
     console.log('Loading cache...');
     // Download the cache zip file
-    const response = await fetch('https://api.j3.gg/package/cache.zip');
+    const response = await fetch((window as any).cacheServer + '/package/cache.zip');
     const arrayBuffer = await response.arrayBuffer();
 
     // Use JSZip to unzip the file
@@ -216,7 +215,7 @@ export async function loadVoicePairsCache() {
         }
     }
     // Download the voicepairs.json file
-    const response = await fetch('https://api.j3.gg/voicepairs.json');
+    const response = await fetch((window as any).cacheServer + '/voicepairs.json');
     const voicePairs = await response.json();
 
     // Add each voice pair to the IndexedDB

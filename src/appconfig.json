@@ -1,16 +1,16 @@
 {
-	"appName": "Dialog TTS",
-	"description": "Alt1 app that parses dialog boxes to various text to speech engines",
+	"appName": "example app",
+	"description": "minimal alt1 webpack/ts example test app",
 	"appUrl": "./index.html",
 	"configUrl": "./appconfig.json",
 	"iconUrl": "./icon.png",
-	"defaultWidth": 350,
+	"defaultWidth": 250,
 	"defaultHeight": 250,
-	"minWidth": 350,
+	"minWidth": 250,
 	"minHeight": 180,
 	"maxWidth": 1000,
 	"maxHeight": 1000,
 	"requestHandlers": [ ],
 	"activators": [	],
-	"permissions": "pixel"
+	"permissions": "pixel,overlay"
 }

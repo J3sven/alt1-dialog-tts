@@ -1,21 +1,14 @@
-import * as a1lib from "@alt1/base";
-import DialogReader from "@alt1/dialog"
-import { AwsTextToSpeech, MeSpeakTextToSpeech, ElevenLabsTextToSpeech } from "./tts";
+import * as a1lib from "alt1";
+import DialogReader from "alt1/dialog"
+import { ElevenLabsTextToSpeech } from "./tts";
 import { processString, capitalizeName, filterName } from "./stringfunctions";
 
 const dialog = new DialogReader();
 var statusDiv = document.getElementById("status");
 
-export let tts: MeSpeakTextToSpeech | AwsTextToSpeech | ElevenLabsTextToSpeech;
-const awsNeural = localStorage.getItem("awsttsEngine") === "true";
+export let tts: ElevenLabsTextToSpeech;
 
-const ttsEngine = {
-	"aws": () => new AwsTextToSpeech(localStorage.getItem("awsAccessKey"), localStorage.getItem("awsSecretKey"), localStorage.getItem("awsRegion"), awsNeural),
-	"elevenlabs": () => new ElevenLabsTextToSpeech(localStorage.getItem("elevenlabsapikey"), 'MF3mGyEYCl7XYWbV9V6O', 'VR6AewLTigWG4xSOukaG'),
-	"default": () => new MeSpeakTextToSpeech()
-}
-
-tts = (ttsEngine[localStorage.getItem("ttsEngine")] || ttsEngine.default)();
+tts = new ElevenLabsTextToSpeech(localStorage.getItem("elevenlabsapikey"), 'MF3mGyEYCl7XYWbV9V6O', 'VR6AewLTigWG4xSOukaG');
 
 export async function capture(player:any) {
 	var img = a1lib.captureHoldFullRs();

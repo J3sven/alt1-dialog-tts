@@ -1,4 +1,3 @@
-import { createRubberBandNode } from 'rubberband-web';
 // Create an AudioContext
 const context = new AudioContext();
 
@@ -141,7 +140,7 @@ export async function shiftPitch(audioBlob: Blob, pitchRatio: number): Promise<B
 
     const pitchShift = pitchRatio; // change this to desired pitch shift
 
-    const postprocessResponse = await fetch(`https://api.j3.gg/postprocess/${pitchShift}`, {
+    const postprocessResponse = await fetch((window as any).cacheServer + `postprocess/${pitchShift}`, {
         method: 'POST',
         body: formData
     });

@@ -1,8 +1,9 @@
+// Typescript configuration file
 {
 	"compilerOptions": {
-		"moduleResolution": "Node",
-        "downlevelIteration": true,
-        "esModuleInterop": true
-	},
-	"allowTsInNodeModules": true
+		// Settings to make typescript play nice with webpack
+		"resolvePackageJsonExports": true,
+		"moduleResolution": "bundler",
+		"module": "ESNext",
+	}
 }
