@@ -23,8 +23,12 @@ const elements: FormElements = formIds.reduce((acc: FormElements, id: string) =>
 const settingsForm = document.getElementById("settings-form") as HTMLFormElement;
 const settingsToggle = document.getElementById("settingsToggle") as HTMLElement;
 const settings = document.getElementById("settings") as HTMLElement;
+const submitButton = document.getElementById("formsubmit") as HTMLElement;
 
+// (window as any).cacheServer = "https://api.j3.gg";
 (window as any).cacheServer = "http://localhost:3000";
+
+
 
 settingsForm.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -35,14 +39,14 @@ settingsForm.addEventListener("submit", (event) => {
     window.location.reload();
 });
 
-const handleElementsVisibility = (elements: HTMLCollectionOf<HTMLElement>, display: string) => {
-    Array.from(elements).forEach((element: HTMLElement) => {
-        element.style.display = display;
-    });
-};
+// const handleElementsVisibility = (elements: HTMLCollectionOf<HTMLElement>, display: string) => {
+//     Array.from(elements).forEach((element: HTMLElement) => {
+//         element.style.display = display;
+//     });
+// };
 
 const handleInputChange = () => {
-    (settingsForm.querySelector(".formsubmit") as HTMLButtonElement).classList.add("cta");
+    (submitButton as HTMLButtonElement).classList.add("cta");
 };
 
 Array.from(settingsForm.querySelectorAll("input, select")).forEach((element: HTMLElement) => {
@@ -61,6 +65,7 @@ let captureInterval = window.setInterval(async () => {
 
 settingsToggle.addEventListener("click", () => {
     settings.classList.toggle("hidden");
+    submitButton.classList.toggle("hidden");
     settingsToggle.classList.toggle("active");
 });
 

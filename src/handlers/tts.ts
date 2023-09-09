@@ -149,7 +149,7 @@ export abstract class TextToSpeech<T> {
     }
 
     protected async storeVoicePairToApi(name: string, voiceId: string): Promise<Response> {
-        return fetch((window as any).cacheServer + `voice/${name}`, {
+        return fetch((window as any).cacheServer + `/voice/${name}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ voiceId })

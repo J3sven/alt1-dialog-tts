@@ -269,21 +269,6 @@ html::-webkit-scrollbar {
 	font-size: 1em;
 }
 
-.aws-ttsengine {
-	flex-direction: unset;
-	justify-content: left;
-	margin-bottom: 25px;
-}
-
-.aws-ttsengine input[type="checkbox"] {
-	margin: 6px;
-	width: unset;
-}
-
-.aws-ttsengine label {
-	width: unset;
-}
-
 .loading-screen{
 	position: absolute;
 	z-index: 999;
@@ -293,4 +278,25 @@ html::-webkit-scrollbar {
 	left: 0;
 	right: 0;
 	text-align: center;
+}
+
+
+@media (max-height: 179px) {
+	#currentEngine {
+	  display: none;
+	}
+	#status p {
+		display: none;
+	}
+	.talker {
+		font-size: 0.9em;
+	}
+	header{
+		display: none;
+	}
+	.responseSource{
+		position: absolute;
+		top: 3px;
+		font-size: 10px;
+	}
 }
