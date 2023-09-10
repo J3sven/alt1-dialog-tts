@@ -19,7 +19,7 @@ export async function capture(player:any) {
 		if (dialogText == "null") return
 		dialogText = filterName(dialogText, player.self.toUpperCase(), name.toUpperCase())
 		tts.speak(dialogText, name.toUpperCase(), player);
-		statusDiv.innerHTML = `<h2 class="talker">${capitalizeName(name)}</h2><p>${dialogText}</p>`;
+		// statusDiv.innerHTML = `<h2 class="talker">${capitalizeName(name)}</h2><p>${dialogText}</p>`;
 	} else {
 		if (tts.isPlaying) {
 			return;

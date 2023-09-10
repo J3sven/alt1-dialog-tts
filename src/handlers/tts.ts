@@ -1,4 +1,4 @@
-import { stringExistsInJson, processNameString, fixPhonetics } from './stringfunctions';
+import { stringExistsInJson, capitalizeName, processNameString, fixPhonetics } from './stringfunctions';
 import { loadGenderData } from './gender';
 import { getXiCharactersRemaining } from "./xilabs";
 import { gsap } from 'gsap';
@@ -14,11 +14,18 @@ var genderCache: { FemaleNpcs: string[] } | null = null;
 
 export abstract class TextToSpeech<T> {
     protected audioQueue: T[] = [];
+    protected dialogQueue: { name: string, text: string }[] = [];
     public isPlaying = false;
     protected lastProcessedString: string | null = null;
     protected femaleVoice: string;
     protected maleVoice: string;
     public audioVolume: number = 1;
+
+    public updateUIWithText(name: string, dialogText: string): void {
+        document.getElementById("status").innerHTML = `<h2 class="talker">${capitalizeName(name)}</h2><p>${dialogText}</p>`;
+        const progressBar = document.getElementById('progress') as HTMLElement;
+        progressBar.style.width = "0%";
+    }
 
     protected async isFemale(name: string): Promise<boolean> {
         const jsonData = await loadGenderData(femaleNpcs, genderCache);
@@ -89,6 +96,7 @@ export abstract class TextToSpeech<T> {
             }
         }
 
+        this.dialogQueue.push({ name, text });
         await this.processSpeech(fixPhonetics(text), genderVoice, name.toUpperCase());
     }
 
@@ -105,14 +113,36 @@ export abstract class TextToSpeech<T> {
             "TxGEqnHWrfWFTfGW9XjX",
             "VR6AewLTigWG4xSOukaG",
             "pNInz6obpgDQGcFmaJgB",
-            "yoZ06aMxZJJ28mfd3POQ"
+            "yoZ06aMxZJJ28mfd3POQ",
+            "2EiwWnXFnvU5JabPnv8n",
+            "CYw3kZ02Hs0563khs1Fj",
+            "D38z5RcWu1voky8WS1ja",
+            "N2lVS1w4EtoT3dr4eOWO",
+            "ODq5zmih8GrVes37Dizd",
+            "SOYHLrjzK2X1ezoPC6cr",
+            "TX3LPaxmHKxFdv7VOQHJ",
+            "Yko7PKHZNXotIFUBG7I9",
+            "ZQe5CZNOzWyzPSCn5a3c",
+            "Zlb1dXrM653N07WRdFW3",
+            "bVMeCyTHy58xNoL34h3p",
+            "g5CIjZEefAph4nQFvHAz",
+            "onwK4e9ZLuTAKqWW03F9"
         ];
     
         const femaleVoiceIds = [
             "21m00Tcm4TlvDq8ikWAM",
             "AZnzlk1XvdvUeBnXmlld",
             "EXAVITQu4vr4xnSDxMaL",
-            "MF3mGyEYCl7XYWbV9V6O"
+            "MF3mGyEYCl7XYWbV9V6O",
+            "AZnzlk1XvdvUeBnXmlld",
+            "ThT5KcBeYPX3keUQqHPh",
+            "XB0fDUnXU5powFXDhCwa",
+            "XrExE9yKIg1WjnnlVkGX",
+            "jBpfuIE2acCO8z3wKNLl",
+            "jsCqWAovK2LkecY7zXl4",
+            "oWAxZDx7w5VEj9dCyTzz",
+            "pMsXgVXv3BLzUgSXRplE",
+            "z9fAnlkpzviPz146aGWa"
         ];
     
         try {
@@ -264,6 +294,7 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
             }
 
             const audioSrc = URL.createObjectURL(audioContent);
+
             this.audioQueue.push(audioSrc);
 
             if (!this.isPlaying) {
@@ -313,13 +344,15 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
         }
 
         this.isPlaying = true;
-        const audioSrc = this.audioQueue.shift();
+        const audioSrc = this.audioQueue.shift();;
+        const dialog = this.dialogQueue.shift();
         if (!audioSrc) {
             this.isPlaying = false;
             return;
         }
 
         const audio = new Audio(audioSrc);
+        this.updateUIWithText(dialog.name, dialog.text);
         audio.volume = this.audioVolume;
         sourceElement.innerText = this.receivedFrom;
         sourceElement.style.display = "inline-block";
