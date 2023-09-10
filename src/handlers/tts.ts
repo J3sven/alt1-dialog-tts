@@ -13,13 +13,14 @@ const sourceElement = document.querySelector('.responseSource') as HTMLElement;
 var genderCache: { FemaleNpcs: string[] } | null = null;
 
 export abstract class TextToSpeech<T> {
-    protected audioQueue: T[] = [];
-    protected dialogQueue: { name: string, text: string }[] = [];
+    protected audioQueue: { src: string, id: number }[] = [];
+    protected dialogQueue: { name: string, text: string, id: number }[] = [];
     public isPlaying = false;
     protected lastProcessedString: string | null = null;
     protected femaleVoice: string;
     protected maleVoice: string;
     public audioVolume: number = 1;
+    protected nextId: number = 0;
 
     public updateUIWithText(name: string, dialogText: string): void {
         document.getElementById("status").innerHTML = `<h2 class="talker">${capitalizeName(name)}</h2><p>${dialogText}</p>`;
@@ -80,8 +81,10 @@ export abstract class TextToSpeech<T> {
             return;
         }
 
+        const currentId = this.nextId++;
+
         this.lastProcessedString = text;
-        this.dialogQueue.push({ name, text });
+        this.dialogQueue.push({ name, text, id: currentId });
 
         let genderVoice = this.maleVoice;
         if (this.isFemale(name)) {
@@ -96,12 +99,12 @@ export abstract class TextToSpeech<T> {
                 name = 'player-male';
             }
         }
-        await this.processSpeech(fixPhonetics(text), genderVoice, name.toUpperCase());
+        await this.processSpeech(fixPhonetics(text), genderVoice, name.toUpperCase(), currentId);
     }
 
     protected abstract isInAudioQueue(text: string): boolean;
 
-    protected abstract processSpeech(text: string, genderVoice: string, name: string): Promise<void>;
+    protected abstract processSpeech(text: string, name: string, genderVoice:string, currentId: number): Promise<void>;
 
 
     protected async getVoiceId(name: string, isMale: boolean): Promise<string> {
@@ -207,8 +210,8 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
     }
 
     protected isInAudioQueue(text: string): boolean {
-        return this.audioQueue.includes(text);
-    }
+        return this.audioQueue.some(audioObj => audioObj.src === text);
+    }    
 
     protected async postAudio(hash: string, audio: Blob, name: string): Promise<void> {
         try {
@@ -228,7 +231,7 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
         }
     }
 
-    protected async processSpeech(text: string, genderVoice: string, name: string): Promise<void> {
+    protected async processSpeech(text: string, genderVoice: string, name: string, currentId: number): Promise<void> {
         let voiceId: string;
         console.log('text: ' + text);
         const voiceIdLookup = {
@@ -294,7 +297,10 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
 
             const audioSrc = URL.createObjectURL(audioContent);
 
-            this.audioQueue.push(audioSrc);
+            this.audioQueue.push({ src: audioSrc, id: currentId });
+
+            this.audioQueue.sort((a, b) => a.id - b.id);
+            this.dialogQueue.sort((a, b) => a.id - b.id);
 
             if (!this.isPlaying) {
                 await this.playNext();
@@ -343,14 +349,14 @@ export class ElevenLabsTextToSpeech extends TextToSpeech<string> {
         }
 
         this.isPlaying = true;
-        const audioSrc = this.audioQueue.shift();;
+        const audioData = this.audioQueue.shift();
         const dialog = this.dialogQueue.shift();
-        if (!audioSrc) {
+        if (!audioData) {
             this.isPlaying = false;
             return;
         }
-
-        const audio = new Audio(audioSrc);
+        
+        const audio = new Audio(audioData.src);
         this.updateUIWithText(dialog.name, dialog.text);
         audio.volume = this.audioVolume;
         sourceElement.innerText = this.receivedFrom;

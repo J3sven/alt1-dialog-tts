@@ -1,7 +1,7 @@
 export const phoneticsMap: { [word: string]: string; } = {
   "glacor": "glaysoar",
   "ardougne": "ardoyn",
-  "guthix": "goothicks",
+  "guthix": "guthicks",
   "saradomin": "saradohmin",
   "zamorak": "zamohrak",
   "bandos": "bandoss",
@@ -12,8 +12,7 @@ export const phoneticsMap: { [word: string]: string; } = {
   "k'ril tsutsaroth": "krill tsootsaroth",
   "tirannwn": "tiranun",
   "gielinor": "Gillinor",
-  "morytania": "Moreetayneeah",
-  "asgarnia": "Asgarneeah",
+  "morytania": "Moreetania",
   "kandarin": "Candarin",
   "karamja": "Caramja",
   "ariane": "Aireeann",
