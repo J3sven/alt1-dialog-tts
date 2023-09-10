@@ -13,9 +13,9 @@ module.exports = {
         "main": "./index.ts"
     },
     output: {
-        path: path.resolve(__dirname, "dist"),
+        path: path.resolve(__dirname, "dist/tts"),
         // library means that the exports from the entry file can be accessed from outside, in this case from the global scope as window.TestApp
-        library: { type: "umd", name: "TestApp" }
+        library: { type: "umd", name: "Dialog TTS" }
     },
     devtool: false,
     mode: "development",
@@ -45,6 +45,7 @@ module.exports = {
     plugins: [
         new CopyPlugin({
             patterns: [
+                { from: 'landing', to: '../'},
                 { from: 'index.html', to: 'index.html' },
                 { from: 'appconfig.json', to: 'appconfig.json' },
                 { from: 'app.css', to: 'app.css' },

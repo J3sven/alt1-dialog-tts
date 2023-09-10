@@ -3,7 +3,7 @@ import { populateFormFromLocalStorage } from "./handlers/playerform";
 import { capture } from "./handlers/capture";
 import { loadCache } from './handlers/localcache';
 
-(window as any).cacheServer = "https://api.j3.gg";
+(window as any).cacheServer = "https://api.j3.gg/";
 // (window as any).cacheServer = "http://localhost:3000";
 
 populateFormFromLocalStorage();
@@ -29,12 +29,6 @@ settingsForm.addEventListener("submit", (event) => {
     });
     window.location.reload();
 });
-
-// const handleElementsVisibility = (elements: HTMLCollectionOf<HTMLElement>, display: string) => {
-//     Array.from(elements).forEach((element: HTMLElement) => {
-//         element.style.display = display;
-//     });
-// };
 
 const handleInputChange = () => {
     (submitButton as HTMLButtonElement).classList.add("cta");
