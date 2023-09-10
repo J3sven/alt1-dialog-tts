@@ -35,4 +35,5 @@ export const phoneticsMap: { [word: string]: string; } = {
   "ales" : "ails",
   "tier" : "tir",
   "adrasteia": "Adrahsteeya",
+  "Iban": "eyeban",
 };

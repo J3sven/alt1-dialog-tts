@@ -11,21 +11,22 @@ export function stringExistsInJson(searchString: string, jsonData: { FemaleNpcs:
 
 export function processString(inputString: string): string {
     const asteriskRegex = /\*([^*]+)\*/g;
-
     const commaRegex = /,([^ ])/g;
     const oneApostropheRegex = /1'/g;
     const oneMRegex = /1m/g;
     const oneVeRegex = /1ve/g;
     const oneDRegex = /1d/g;
     const oneLLRegex = /1ll/g;
+    const dotRegex = /\.{2,}/g;
 
     const withoutAsterisks = inputString.replace(asteriskRegex, '');
-    const commaFixedString = withoutAsterisks.replace(commaRegex, ' $1');
+    const commaFixedString = withoutAsterisks.replace(commaRegex, ', $1');
     const apostropheFixedString = commaFixedString.replace(oneApostropheRegex, "I'");
     const mFixedString = apostropheFixedString.replace(oneMRegex, "I'm");
     const veFixedString = mFixedString.replace(oneVeRegex, "I've");
     const dFixedString = veFixedString.replace(oneDRegex, "I'd");
-    const result = dFixedString.replace(oneLLRegex, "I'll");
+    const llFixedString = dFixedString.replace(oneLLRegex, "I'll");
+    const result = llFixedString.replace(dotRegex, '. ');
 
     return result;
 }
