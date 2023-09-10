@@ -81,6 +81,7 @@ export abstract class TextToSpeech<T> {
         }
 
         this.lastProcessedString = text;
+        this.dialogQueue.push({ name, text });
 
         let genderVoice = this.maleVoice;
         if (this.isFemale(name)) {
@@ -95,8 +96,6 @@ export abstract class TextToSpeech<T> {
                 name = 'player-male';
             }
         }
-
-        this.dialogQueue.push({ name, text });
         await this.processSpeech(fixPhonetics(text), genderVoice, name.toUpperCase());
     }
 
