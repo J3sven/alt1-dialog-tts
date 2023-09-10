@@ -7,6 +7,7 @@
 		"@types/aws-sdk": "^2.7.0",
 		"alt1": "^0.0.2",
 		"aws-sdk": "^2.1378.0",
+		"copy-webpack-plugin": "^11.0.0",
 		"gsap": "^3.12.2",
 		"jszip": "^3.10.1",
 		"rubberband-web": "^0.2.1",

@@ -296,7 +296,7 @@ html::-webkit-scrollbar {
 	}
 	.responseSource{
 		position: absolute;
-		top: 3px;
+		top: 3px !important;
 		font-size: 10px;
 	}
 }

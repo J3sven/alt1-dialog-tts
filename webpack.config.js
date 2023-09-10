@@ -1,4 +1,5 @@
 const path = require("path");
+const CopyPlugin = require("copy-webpack-plugin");
 
 /**
  * @type {import("webpack").Configuration}
@@ -40,5 +41,15 @@ module.exports = {
             { test: /\.data\.png$/, loader: "alt1/imagedata-loader", type: "javascript/auto" },
             { test: /\.fontmeta.json/, loader: "alt1/font-loader" }
         ]
-    }
+    },
+    plugins: [
+        new CopyPlugin({
+            patterns: [
+                { from: 'app.css', to: 'app.css' },
+                { from: 'icon.png', to: 'icon.png' },
+                { from: 'handlers/sounds', to: 'sounds' },
+                { from: 'handlers/data/femaleNpcs.json', to: 'data/femaleNpcs.json' },
+            ],
+        }),
+    ]
 }
