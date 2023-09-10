@@ -25,8 +25,8 @@ const settingsToggle = document.getElementById("settingsToggle") as HTMLElement;
 const settings = document.getElementById("settings") as HTMLElement;
 const submitButton = document.getElementById("formsubmit") as HTMLElement;
 
-// (window as any).cacheServer = "https://api.j3.gg";
-(window as any).cacheServer = "http://localhost:3000";
+(window as any).cacheServer = "https://api.j3.gg";
+// (window as any).cacheServer = "http://localhost:3000";
 
 
 
