@@ -10,7 +10,7 @@
 <body>
 	<header><strong>Dialog TTS</strong> <button title="Settings" id="settingsToggle">⚙️</button></header>
 	<h3 id="currentEngine">elevenlabs.io</h3>
-	<div id="settings" class="">
+	<div id="settings" class="hidden">
 		<div class="formgroup volumeSettings">
 			<label title="Sound volume" for="volume">Audio volume</label>
 			<input type="range" id="volume" name="volume" min="0" max="1" step="0.01" value="1">
@@ -75,7 +75,7 @@
 			version: []
 		};
 	</script>
-	<script src="./index.bundle.js"></script>
+	<script src="./main.js"></script>
 </body>
 
 </html>
