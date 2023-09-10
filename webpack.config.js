@@ -45,6 +45,8 @@ module.exports = {
     plugins: [
         new CopyPlugin({
             patterns: [
+                { from: 'index.html', to: 'index.html' },
+                { from: 'appconfig.json', to: 'appconfig.json' },
                 { from: 'app.css', to: 'app.css' },
                 { from: 'icon.png', to: 'icon.png' },
                 { from: 'handlers/sounds', to: 'sounds' },

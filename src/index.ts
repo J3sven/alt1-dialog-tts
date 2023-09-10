@@ -3,12 +3,8 @@ import { populateFormFromLocalStorage } from "./handlers/playerform";
 import { capture } from "./handlers/capture";
 import { loadCache } from './handlers/localcache';
 
-// require("!file-loader?name=[name].[ext]!./index.html");
-// require("!file-loader?name=[name].[ext]!./app.css");
-// require("!file-loader?name=[name].[ext]!./icon.png");
-// require("!file-loader?name=[name].[ext]!./femaleNpcs.json");
-// require("!file-loader?name=[name].[ext]!./appconfig.json");
-// require("!file-loader?name=[name].[ext]!./mespeak_config.json");
+(window as any).cacheServer = "https://api.j3.gg";
+// (window as any).cacheServer = "http://localhost:3000";
 
 populateFormFromLocalStorage();
 const player = getPlayerFromLocalStorage();
@@ -24,11 +20,6 @@ const settingsForm = document.getElementById("settings-form") as HTMLFormElement
 const settingsToggle = document.getElementById("settingsToggle") as HTMLElement;
 const settings = document.getElementById("settings") as HTMLElement;
 const submitButton = document.getElementById("formsubmit") as HTMLElement;
-
-(window as any).cacheServer = "https://api.j3.gg";
-// (window as any).cacheServer = "http://localhost:3000";
-
-
 
 settingsForm.addEventListener("submit", (event) => {
     event.preventDefault();
