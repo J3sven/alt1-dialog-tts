@@ -3,7 +3,7 @@ import { populateFormFromLocalStorage } from "./handlers/playerform";
 import { capture } from "./handlers/capture";
 import { loadCache } from './handlers/localcache';
 
-(window as any).cacheServer = "https://api.j3.gg/";
+(window as any).cacheServer = "https://api.j3.gg";
 // (window as any).cacheServer = "http://localhost:3000";
 
 populateFormFromLocalStorage();
